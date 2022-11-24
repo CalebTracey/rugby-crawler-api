@@ -1,9 +1,8 @@
 package response
 
-type PSQLResponse struct {
-	RowsAffected string  `json:"rowsAffected,omitempty"`
-	LastInsertID string  `json:"lastInsertID,omitempty"`
-	Message      Message `json:"message,omitempty"`
+type CompetitionCrawlResponse struct {
+	CompetitionName string  `json:"competitionName,omitempty"`
+	Message         Message `json:"message,omitempty"`
 }
 
 type Message struct {

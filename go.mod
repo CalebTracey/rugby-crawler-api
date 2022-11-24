@@ -1,4 +1,4 @@
-module github.com/calebtracey/api-template
+module github.com/calebtracey/rugby-crawler-api
 
 go 1.19
 

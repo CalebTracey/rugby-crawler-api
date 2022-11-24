@@ -87,14 +87,14 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// AddToDatabase request with any body
-	AddToDatabaseWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CrawlComp request with any body
+	CrawlCompWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	AddToDatabase(ctx context.Context, body AddToDatabaseJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CrawlComp(ctx context.Context, body CrawlCompJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) AddToDatabaseWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAddToDatabaseRequestWithBody(c.Server, contentType, body)
+func (c *Client) CrawlCompWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCrawlCompRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -105,8 +105,8 @@ func (c *Client) AddToDatabaseWithBody(ctx context.Context, contentType string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) AddToDatabase(ctx context.Context, body AddToDatabaseJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAddToDatabaseRequest(c.Server, body)
+func (c *Client) CrawlComp(ctx context.Context, body CrawlCompJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCrawlCompRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -117,19 +117,19 @@ func (c *Client) AddToDatabase(ctx context.Context, body AddToDatabaseJSONReques
 	return c.Client.Do(req)
 }
 
-// NewAddToDatabaseRequest calls the generic AddToDatabase builder with application/json body
-func NewAddToDatabaseRequest(server string, body AddToDatabaseJSONRequestBody) (*http.Request, error) {
+// NewCrawlCompRequest calls the generic CrawlComp builder with application/json body
+func NewCrawlCompRequest(server string, body CrawlCompJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewAddToDatabaseRequestWithBody(server, "application/json", bodyReader)
+	return NewCrawlCompRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewAddToDatabaseRequestWithBody generates requests for AddToDatabase with any type of body
-func NewAddToDatabaseRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewCrawlCompRequestWithBody generates requests for CrawlComp with any type of body
+func NewCrawlCompRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -137,7 +137,7 @@ func NewAddToDatabaseRequestWithBody(server string, contentType string, body io.
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/add")
+	operationPath := fmt.Sprintf("/competition")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -200,34 +200,31 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// AddToDatabase request with any body
-	AddToDatabaseWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddToDatabaseResponse, error)
+	// CrawlComp request with any body
+	CrawlCompWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CrawlCompResponse, error)
 
-	AddToDatabaseWithResponse(ctx context.Context, body AddToDatabaseJSONRequestBody, reqEditors ...RequestEditorFn) (*AddToDatabaseResponse, error)
+	CrawlCompWithResponse(ctx context.Context, body CrawlCompJSONRequestBody, reqEditors ...RequestEditorFn) (*CrawlCompResponse, error)
 }
 
-type AddToDatabaseResponse struct {
+type CrawlCompResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *struct {
-		LastInsertID *string  `json:"lastInsertID,omitempty"`
-		Message      *Message `json:"message,omitempty"`
-		RowsAffected *string  `json:"rowsAffected"`
+		CompetitionName *string  `json:"competitionName"`
+		Message         *Message `json:"message,omitempty"`
 	}
 	JSON400 *struct {
-		LastInsertID *string  `json:"lastInsertID,omitempty"`
-		Message      *Message `json:"message,omitempty"`
-		RowsAffected *string  `json:"rowsAffected"`
+		CompetitionName *string  `json:"competitionName"`
+		Message         *Message `json:"message,omitempty"`
 	}
 	JSON500 *struct {
-		LastInsertID *string  `json:"lastInsertID,omitempty"`
-		Message      *Message `json:"message,omitempty"`
-		RowsAffected *string  `json:"rowsAffected"`
+		CompetitionName *string  `json:"competitionName"`
+		Message         *Message `json:"message,omitempty"`
 	}
 }
 
 // Status returns HTTPResponse.Status
-func (r AddToDatabaseResponse) Status() string {
+func (r CrawlCompResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -235,39 +232,39 @@ func (r AddToDatabaseResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r AddToDatabaseResponse) StatusCode() int {
+func (r CrawlCompResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// AddToDatabaseWithBodyWithResponse request with arbitrary body returning *AddToDatabaseResponse
-func (c *ClientWithResponses) AddToDatabaseWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddToDatabaseResponse, error) {
-	rsp, err := c.AddToDatabaseWithBody(ctx, contentType, body, reqEditors...)
+// CrawlCompWithBodyWithResponse request with arbitrary body returning *CrawlCompResponse
+func (c *ClientWithResponses) CrawlCompWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CrawlCompResponse, error) {
+	rsp, err := c.CrawlCompWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAddToDatabaseResponse(rsp)
+	return ParseCrawlCompResponse(rsp)
 }
 
-func (c *ClientWithResponses) AddToDatabaseWithResponse(ctx context.Context, body AddToDatabaseJSONRequestBody, reqEditors ...RequestEditorFn) (*AddToDatabaseResponse, error) {
-	rsp, err := c.AddToDatabase(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CrawlCompWithResponse(ctx context.Context, body CrawlCompJSONRequestBody, reqEditors ...RequestEditorFn) (*CrawlCompResponse, error) {
+	rsp, err := c.CrawlComp(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAddToDatabaseResponse(rsp)
+	return ParseCrawlCompResponse(rsp)
 }
 
-// ParseAddToDatabaseResponse parses an HTTP response from a AddToDatabaseWithResponse call
-func ParseAddToDatabaseResponse(rsp *http.Response) (*AddToDatabaseResponse, error) {
+// ParseCrawlCompResponse parses an HTTP response from a CrawlCompWithResponse call
+func ParseCrawlCompResponse(rsp *http.Response) (*CrawlCompResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &AddToDatabaseResponse{
+	response := &CrawlCompResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -275,9 +272,8 @@ func ParseAddToDatabaseResponse(rsp *http.Response) (*AddToDatabaseResponse, err
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest struct {
-			LastInsertID *string  `json:"lastInsertID,omitempty"`
-			Message      *Message `json:"message,omitempty"`
-			RowsAffected *string  `json:"rowsAffected"`
+			CompetitionName *string  `json:"competitionName"`
+			Message         *Message `json:"message,omitempty"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -286,9 +282,8 @@ func ParseAddToDatabaseResponse(rsp *http.Response) (*AddToDatabaseResponse, err
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest struct {
-			LastInsertID *string  `json:"lastInsertID,omitempty"`
-			Message      *Message `json:"message,omitempty"`
-			RowsAffected *string  `json:"rowsAffected"`
+			CompetitionName *string  `json:"competitionName"`
+			Message         *Message `json:"message,omitempty"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -297,9 +292,8 @@ func ParseAddToDatabaseResponse(rsp *http.Response) (*AddToDatabaseResponse, err
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
-			LastInsertID *string  `json:"lastInsertID,omitempty"`
-			Message      *Message `json:"message,omitempty"`
-			RowsAffected *string  `json:"rowsAffected"`
+			CompetitionName *string  `json:"competitionName"`
+			Message         *Message `json:"message,omitempty"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err

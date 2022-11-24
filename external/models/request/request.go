@@ -1,7 +1,6 @@
 package request
 
-type PSQLRequest struct {
-	RequestType string `json:"requestType,omitempty"`
-	Table       string `json:"table,omitempty"`
-	Id          string `json:"id,omitempty"`
+type CompetitionCrawlRequest struct {
+	CompetitionID string `json:"competitionID,omitempty"`
+	Date          string `json:"date,omitempty"`
 }

@@ -3,7 +3,7 @@ package routes
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/calebtracey/api-template/external/models/response"
+	"github.com/calebtracey/rugby-crawler-api/external/models/response"
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
