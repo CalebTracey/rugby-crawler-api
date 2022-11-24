@@ -26,8 +26,9 @@ type Message struct {
 
 // CompetitionCrawlResponse defines model for CompetitionCrawlResponse.
 type CompetitionCrawlResponse struct {
-	CompetitionName *string  `json:"competitionName"`
-	Message         *Message `json:"message,omitempty"`
+	CompId  *string  `json:"compId"`
+	Message *Message `json:"message,omitempty"`
+	Name    *string  `json:"name"`
 }
 
 // CompetitionCrawlRequest defines model for CompetitionCrawlRequest.

@@ -24,6 +24,6 @@ func main() {
 		log.Fatalf("Couldn't get competition %s", err)
 	}
 
-	fmt.Printf("\tCompetition Name: %s\n", *respC.JSON201.CompetitionName)
+	fmt.Printf("\tCompetition Name: %s\n", *respC.JSON201.Name)
 	fmt.Printf("\tMessage: %v\n", *respC.JSON201.Message)
 }

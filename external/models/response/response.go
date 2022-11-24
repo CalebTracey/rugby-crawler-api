@@ -1,8 +1,10 @@
 package response
 
 type CompetitionCrawlResponse struct {
-	CompetitionName string  `json:"competitionName,omitempty"`
-	Message         Message `json:"message,omitempty"`
+	CompId  string   `json:"compId,omitempty"`
+	Name    string   `json:"name,omitempty"`
+	TeamIds []string `json:"teamIds,omitempty"`
+	Message Message  `json:"message,omitempty"`
 }
 
 type Message struct {

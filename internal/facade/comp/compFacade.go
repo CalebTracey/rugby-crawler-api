@@ -6,6 +6,7 @@ import (
 	"github.com/calebtracey/rugby-crawler-api/external/models/response"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/comp"
 	compCrawl "github.com/calebtracey/rugby-crawler-api/internal/dao/comp"
+	"github.com/calebtracey/rugby-crawler-api/internal/dao/psql"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,6 +18,7 @@ type FacadeI interface {
 }
 
 type Facade struct {
+	DBDAO      psql.DAOI
 	CompDAO    compCrawl.DAOI
 	CompMapper comp.MapperI
 }
@@ -24,13 +26,26 @@ type Facade struct {
 func (s Facade) CompetitionCrawl(ctx context.Context, req request.CompetitionCrawlRequest) (resp response.CompetitionCrawlResponse) {
 	//TODO create scrape url
 	url := ""
-	_, err := s.CompDAO.CompCrawlData(ctx, url, req.Date)
+	resp, err := s.CompDAO.CompCrawlData(ctx, url, req.Date)
 	if err != nil {
+
 		log.Error(err)
 		return response.CompetitionCrawlResponse{
 			Message: response.Message{
 				ErrorLog: response.ErrorLogs{
 					*err,
+				},
+			},
+		}
+	}
+	compExec := s.CompMapper.MapAddCompetitionData(resp.CompId, resp.Name, resp.TeamIds)
+	_, dbErr := s.DBDAO.InsertOne(ctx, compExec)
+	if dbErr != nil {
+		log.Error(dbErr)
+		return response.CompetitionCrawlResponse{
+			Message: response.Message{
+				ErrorLog: response.ErrorLogs{
+					*dbErr,
 				},
 			},
 		}

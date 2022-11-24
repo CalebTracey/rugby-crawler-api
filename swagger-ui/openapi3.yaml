@@ -18,15 +18,44 @@ components:
       content:
         application/json:
           schema:
+            items:
+              title: teamIds
+              type: string
             nullable: true
             properties:
-              competitionName:
+              compId:
                 nullable: true
                 type: string
               message:
                 $ref: '#/components/schemas/Message'
+              name:
+                nullable: true
+                type: string
       description: Response with competition crawl results
   schemas:
+    CompetitionCrawlRequest:
+      properties:
+        competitionID:
+          type: string
+        date:
+          type: string
+      type: object
+    CompetitionCrawlResponse:
+      nullable: true
+      properties:
+        compId:
+          nullable: true
+          type: string
+        message:
+          $ref: '#/components/schemas/Message'
+        name:
+          nullable: true
+          type: string
+        teamIds:
+          items:
+            type: string
+          type: array
+      type: object
     ErrorLog:
       properties:
         query:
