@@ -2,9 +2,10 @@ package routes
 
 import (
 	"encoding/json"
-	request2 "github.com/calebtracey/api-template/external/models/request"
-	"github.com/calebtracey/api-template/external/models/response"
-	"github.com/calebtracey/api-template/internal/facade"
+	request2 "github.com/calebtracey/rugby-crawler-api/external/models/request"
+	"github.com/calebtracey/rugby-crawler-api/external/models/response"
+	"github.com/calebtracey/rugby-crawler-api/internal/facade"
+	_ "github.com/calebtracey/rugby-crawler-api/internal/routes/statik"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	log "github.com/sirupsen/logrus"
@@ -24,7 +25,7 @@ func (h *Handler) InitializeRoutes() *mux.Router {
 	// Health check
 	r.Handle("/health", h.HealthCheck()).Methods(http.MethodGet)
 
-	r.Handle("/add", h.AddNewHandler()).Methods(http.MethodPost)
+	r.Handle("/competition", h.CompetitionHandler()).Methods(http.MethodPost)
 
 	staticFs, err := fs.New()
 	if err != nil {
@@ -38,31 +39,31 @@ func (h *Handler) InitializeRoutes() *mux.Router {
 	return r
 }
 
-func (h *Handler) AddNewHandler() http.HandlerFunc {
+func (h *Handler) CompetitionHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
-		var psqlResponse response.PSQLResponse
-		var psqlRequest request2.PSQLRequest
+		var compResponse response.CompetitionCrawlResponse
+		var compRequest request2.CompetitionCrawlRequest
 		defer func() {
-			status, _ := strconv.Atoi(psqlResponse.Message.Status)
+			status, _ := strconv.Atoi(compResponse.Message.Status)
 			hn, _ := os.Hostname()
-			psqlResponse.Message.HostName = hn
-			psqlResponse.Message.TimeTaken = time.Since(startTime).String()
-			_ = json.NewEncoder(writeHeader(w, status)).Encode(psqlResponse)
+			compResponse.Message.HostName = hn
+			compResponse.Message.TimeTaken = time.Since(startTime).String()
+			_ = json.NewEncoder(writeHeader(w, status)).Encode(compResponse)
 		}()
 		body, bodyErr := readBody(r.Body)
 
 		if bodyErr != nil {
-			psqlResponse.Message.ErrorLog = errorLogs([]error{bodyErr}, "Unable to read psqlRequest body", http.StatusBadRequest)
+			compResponse.Message.ErrorLog = errorLogs([]error{bodyErr}, "Unable to read psqlRequest body", http.StatusBadRequest)
 			return
 		}
-		err := json.Unmarshal(body, &psqlRequest)
+		err := json.Unmarshal(body, &compRequest)
 		if err != nil {
-			psqlResponse.Message.ErrorLog = errorLogs([]error{err}, "Unable to parse psqlRequest", http.StatusBadRequest)
+			compResponse.Message.ErrorLog = errorLogs([]error{err}, "Unable to parse psqlRequest", http.StatusBadRequest)
 			return
 		}
 
-		psqlResponse = h.Service.PSQLResults(r.Context(), psqlRequest)
+		compResponse = h.Service.CompetitionCrawlData(r.Context(), compRequest)
 	}
 }
 

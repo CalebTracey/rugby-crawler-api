@@ -2,24 +2,22 @@ package facade
 
 import (
 	"context"
-	"github.com/calebtracey/api-template/external/models/request"
-	"github.com/calebtracey/api-template/external/models/response"
-	psql2 "github.com/calebtracey/api-template/internal/facade/psql"
-	"strings"
+	"github.com/calebtracey/rugby-crawler-api/external/models/request"
+	"github.com/calebtracey/rugby-crawler-api/external/models/response"
+	"github.com/calebtracey/rugby-crawler-api/internal/facade/comp"
 )
 
 type APIFacadeI interface {
-	PSQLResults(ctx context.Context, req request.PSQLRequest) (resp response.PSQLResponse)
+	CompetitionCrawlData(ctx context.Context, req request.CompetitionCrawlRequest) (resp response.CompetitionCrawlResponse)
 }
 
 type APIFacade struct {
-	PSQLDao psql2.FacadeI
+	CompService comp.FacadeI
 }
 
-func (s APIFacade) PSQLResults(ctx context.Context, req request.PSQLRequest) (resp response.PSQLResponse) {
+func (s APIFacade) CompetitionCrawlData(ctx context.Context, req request.CompetitionCrawlRequest) (resp response.CompetitionCrawlResponse) {
 	//TODO add validation
-	if strings.EqualFold(req.RequestType, "Insert") {
-		resp = s.PSQLDao.AddNew(ctx, req)
-	}
+	resp = s.CompService.CompetitionCrawl(ctx, req)
+
 	return resp
 }

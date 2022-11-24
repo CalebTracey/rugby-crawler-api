@@ -24,26 +24,23 @@ type Message struct {
 	TimeTaken *string    `json:"timeTaken"`
 }
 
-// PSQLResponse defines model for PSQLResponse.
-type PSQLResponse struct {
-	LastInsertID *string  `json:"lastInsertID,omitempty"`
-	Message      *Message `json:"message,omitempty"`
-	RowsAffected *string  `json:"rowsAffected"`
+// CompetitionCrawlResponse defines model for CompetitionCrawlResponse.
+type CompetitionCrawlResponse struct {
+	CompetitionName *string  `json:"competitionName"`
+	Message         *Message `json:"message,omitempty"`
 }
 
-// PSQLRequest defines model for PSQLRequest.
-type PSQLRequest struct {
-	Id          *string `json:"id,omitempty"`
-	RequestType *string `json:"requestType,omitempty"`
-	Table       *string `json:"table,omitempty"`
+// CompetitionCrawlRequest defines model for CompetitionCrawlRequest.
+type CompetitionCrawlRequest struct {
+	CompetitionID *string `json:"competitionID,omitempty"`
+	Date          *string `json:"date,omitempty"`
 }
 
-// AddToDatabaseJSONBody defines parameters for AddToDatabase.
-type AddToDatabaseJSONBody struct {
-	Id          *string `json:"id,omitempty"`
-	RequestType *string `json:"requestType,omitempty"`
-	Table       *string `json:"table,omitempty"`
+// CrawlCompJSONBody defines parameters for CrawlComp.
+type CrawlCompJSONBody struct {
+	CompetitionID *string `json:"competitionID,omitempty"`
+	Date          *string `json:"date,omitempty"`
 }
 
-// AddToDatabaseJSONRequestBody defines body for AddToDatabase for application/json ContentType.
-type AddToDatabaseJSONRequestBody AddToDatabaseJSONBody
+// CrawlCompJSONRequestBody defines body for CrawlComp for application/json ContentType.
+type CrawlCompJSONRequestBody CrawlCompJSONBody

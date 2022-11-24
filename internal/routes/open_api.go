@@ -7,28 +7,27 @@ import (
 	"net/http"
 )
 
-//TODO update these paths for local development
 //go:generate go run ../../cmd/openapi-gen/main.go -path ../../swagger-ui
 
 //go:generate oapi-codegen -package openapi3 -generate types  -o ../../pkg/openapi3/types.gen.go ../../swagger-ui/openapi3.yaml
 //go:generate oapi-codegen -package openapi3 -generate client -o ../../pkg/openapi3/client.gen.go ../../swagger-ui/openapi3.yaml
 
-//go:generate statik -src=/Users/calebtracey/Desktop/Code/api-template/swagger-ui
+//go:generate statik -src=/Users/calebtracey/Desktop/Code/rugby-crawler-api/swagger-ui
 
 // NewOpenAPI3 instantiates the OpenAPI specification for this service.
 func NewOpenAPI3() openapi3.T {
 	swagger := openapi3.T{
 		OpenAPI: "3.0.0",
 		Info: &openapi3.Info{
-			Title:       "Go REST API template",
-			Description: "REST API used for accessing postres database",
+			Title:       "Rugby Data Crawler REST API",
+			Description: "REST API rugby data web crawler",
 			Version:     "0.0.0",
 			License: &openapi3.License{
 				Name: "MIT",
 				URL:  "https://opensource.org/licenses/MIT",
 			},
 			Contact: &openapi3.Contact{
-				URL: "https://github.com/CalebTracey/api-template",
+				URL: "https://github.com/CalebTracey/rugby-crawler-api",
 			},
 		},
 		Servers: openapi3.Servers{
@@ -74,29 +73,25 @@ func NewOpenAPI3() openapi3.T {
 	}
 
 	swagger.Components.RequestBodies = openapi3.RequestBodies{
-		"PSQLRequest": &openapi3.RequestBodyRef{
+		"CompetitionCrawlRequest": &openapi3.RequestBodyRef{
 			Value: openapi3.NewRequestBody().
-				WithDescription("Request used for fetching postgres data").
+				WithDescription("Request used for crawling competition data").
 				WithRequired(true).
 				WithJSONSchema(openapi3.NewSchema().
-					WithProperty("requestType", openapi3.NewStringSchema().
+					WithProperty("competitionID", openapi3.NewStringSchema().
 						WithMinLength(1)).
-					WithProperty("table", openapi3.NewStringSchema().
-						WithMinLength(1)).
-					WithProperty("id", openapi3.NewStringSchema().
+					WithProperty("date", openapi3.NewStringSchema().
 						WithMinLength(1))),
 		},
 	}
 
 	swagger.Components.Responses = openapi3.Responses{
-		"PSQLResponse": &openapi3.ResponseRef{
+		"CompetitionCrawlResponse": &openapi3.ResponseRef{
 			Value: openapi3.NewResponse().
-				WithDescription("Response with postgres data").
+				WithDescription("Response with competition crawl results").
 				WithContent(openapi3.NewContentWithJSONSchema(openapi3.NewSchema().
-					WithProperty("rowsAffected", openapi3.NewStringSchema().
+					WithProperty("competitionName", openapi3.NewStringSchema().
 						WithNullable()).
-					WithProperty("lastInsertID", openapi3.NewStringSchema()).
-					WithNullable().
 					WithPropertyRef("message", &openapi3.SchemaRef{
 						Ref: "#/components/schemas/Message",
 					}).
@@ -105,22 +100,23 @@ func NewOpenAPI3() openapi3.T {
 	}
 
 	swagger.Paths = openapi3.Paths{
-		"/add": &openapi3.PathItem{
-			Description: "Add Data",
+		"/competition": &openapi3.PathItem{
+			Summary:     "Crawl Requests",
+			Description: "Crawl Competition",
 			Post: &openapi3.Operation{
-				OperationID: "AddToDatabase",
+				OperationID: "CrawlComp",
 				RequestBody: &openapi3.RequestBodyRef{
-					Ref: "#/components/requestBodies/PSQLRequest",
+					Ref: "#/components/requestBodies/CompetitionCrawlRequest",
 				},
 				Responses: openapi3.Responses{
 					"400": &openapi3.ResponseRef{
-						Ref: "#/components/responses/PSQLResponse",
+						Ref: "#/components/responses/CompetitionCrawlResponse",
 					},
 					"500": &openapi3.ResponseRef{
-						Ref: "#/components/responses/PSQLResponse",
+						Ref: "#/components/responses/CompetitionCrawlResponse",
 					},
 					"201": &openapi3.ResponseRef{
-						Ref: "#/components/responses/PSQLResponse",
+						Ref: "#/components/responses/CompetitionCrawlResponse",
 					},
 				},
 			},

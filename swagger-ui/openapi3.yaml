@@ -1,36 +1,31 @@
 components:
   requestBodies:
-    PSQLRequest:
+    CompetitionCrawlRequest:
       content:
         application/json:
           schema:
             properties:
-              id:
+              competitionID:
                 minLength: 1
                 type: string
-              requestType:
+              date:
                 minLength: 1
                 type: string
-              table:
-                minLength: 1
-                type: string
-      description: Request used for fetching postgres data
+      description: Request used for crawling competition data
       required: true
   responses:
-    PSQLResponse:
+    CompetitionCrawlResponse:
       content:
         application/json:
           schema:
             nullable: true
             properties:
-              lastInsertID:
+              competitionName:
+                nullable: true
                 type: string
               message:
                 $ref: '#/components/schemas/Message'
-              rowsAffected:
-                nullable: true
-                type: string
-      description: Response with postgres data
+      description: Response with competition crawl results
   schemas:
     ErrorLog:
       properties:
@@ -73,28 +68,29 @@ components:
       type: object
 info:
   contact:
-    url: https://github.com/CalebTracey/api-template
-  description: REST API used for accessing postres database
+    url: https://github.com/CalebTracey/rugby-crawler-api
+  description: REST API rugby data web crawler
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-  title: Go REST API template
+  title: Rugby Data Crawler REST API
   version: 0.0.0
 openapi: 3.0.0
 paths:
-  /add:
-    description: Add Data
+  /competition:
+    description: Crawl Competition
     post:
-      operationId: AddToDatabase
+      operationId: CrawlComp
       requestBody:
-        $ref: '#/components/requestBodies/PSQLRequest'
+        $ref: '#/components/requestBodies/CompetitionCrawlRequest'
       responses:
         "201":
-          $ref: '#/components/responses/PSQLResponse'
+          $ref: '#/components/responses/CompetitionCrawlResponse'
         "400":
-          $ref: '#/components/responses/PSQLResponse'
+          $ref: '#/components/responses/CompetitionCrawlResponse'
         "500":
-          $ref: '#/components/responses/PSQLResponse'
+          $ref: '#/components/responses/CompetitionCrawlResponse'
+    summary: Crawl Requests
 servers:
 - description: Local development
   url: http://0.0.0.0:6080

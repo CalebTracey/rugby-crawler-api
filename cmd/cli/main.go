@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/calebtracey/api-template/pkg/openapi3"
+	"github.com/calebtracey/rugby-crawler-api/pkg/openapi3"
 	"log"
 )
 
@@ -13,20 +13,17 @@ func main() {
 		log.Fatalf("Couldn't instantiate client: %s", err)
 	}
 
-	reqType := "psql"
-	table := "example"
-	id := "123"
-	respC, err := client.AddToDatabaseWithResponse(context.Background(),
-		openapi3.AddToDatabaseJSONRequestBody{
-			RequestType: &reqType,
-			Table:       &table,
-			Id:          &id,
+	compId := "123"
+	date := "2022/12/12"
+	respC, err := client.CrawlCompWithResponse(context.Background(),
+		openapi3.CrawlCompJSONRequestBody{
+			CompetitionID: &compId,
+			Date:          &date,
 		})
 	if err != nil {
 		log.Fatalf("Couldn't get competition %s", err)
 	}
 
-	fmt.Printf("\tRows Affected: %s\n", *respC.JSON201.RowsAffected)
-	fmt.Printf("\tLast Inserted ID: %v\n", *respC.JSON201.LastInsertID)
+	fmt.Printf("\tCompetition Name: %s\n", *respC.JSON201.CompetitionName)
 	fmt.Printf("\tMessage: %v\n", *respC.JSON201.Message)
 }

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/calebtracey/api-template/internal/routes"
+	"github.com/calebtracey/rugby-crawler-api/internal/routes"
 	"github.com/ghodss/yaml"
 	log "github.com/sirupsen/logrus"
 	"os"

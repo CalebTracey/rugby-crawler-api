@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/NYTimes/gziphandler"
-	"github.com/calebtracey/api-template/internal/routes"
 	config "github.com/calebtracey/config-yaml"
+	"github.com/calebtracey/rugby-crawler-api/internal/routes"
 	log "github.com/sirupsen/logrus"
 )
 
