@@ -39,6 +39,24 @@ func NewOpenAPI3() openapi3.T {
 	}
 
 	swagger.Components.Schemas = openapi3.Schemas{
+		"CompetitionCrawlRequest": openapi3.NewSchemaRef("",
+			openapi3.NewObjectSchema().
+				WithProperty("competitionID", openapi3.NewStringSchema()).
+				WithProperty("date", openapi3.NewStringSchema())),
+		"CompetitionCrawlResponse": openapi3.NewSchemaRef("",
+			openapi3.NewObjectSchema().
+				WithProperty("compId", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("name", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("teamIds", openapi3.NewArraySchema().
+					WithItems(&openapi3.Schema{
+						Type: openapi3.TypeString,
+					})).
+				WithPropertyRef("message", &openapi3.SchemaRef{
+					Ref: "#/components/schemas/Message",
+				}).
+				WithNullable()),
 		"ErrorLog": openapi3.NewSchemaRef("",
 			openapi3.NewObjectSchema().
 				WithProperty("scope", openapi3.NewStringSchema().
@@ -90,8 +108,14 @@ func NewOpenAPI3() openapi3.T {
 			Value: openapi3.NewResponse().
 				WithDescription("Response with competition crawl results").
 				WithContent(openapi3.NewContentWithJSONSchema(openapi3.NewSchema().
-					WithProperty("competitionName", openapi3.NewStringSchema().
+					WithProperty("compId", openapi3.NewStringSchema().
 						WithNullable()).
+					WithProperty("name", openapi3.NewStringSchema().
+						WithNullable()).
+					WithItems(&openapi3.Schema{
+						Title: "teamIds",
+						Type:  openapi3.TypeString,
+					}).
 					WithPropertyRef("message", &openapi3.SchemaRef{
 						Ref: "#/components/schemas/Message",
 					}).

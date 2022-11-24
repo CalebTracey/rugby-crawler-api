@@ -210,16 +210,19 @@ type CrawlCompResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *struct {
-		CompetitionName *string  `json:"competitionName"`
-		Message         *Message `json:"message,omitempty"`
+		CompId  *string  `json:"compId"`
+		Message *Message `json:"message,omitempty"`
+		Name    *string  `json:"name"`
 	}
 	JSON400 *struct {
-		CompetitionName *string  `json:"competitionName"`
-		Message         *Message `json:"message,omitempty"`
+		CompId  *string  `json:"compId"`
+		Message *Message `json:"message,omitempty"`
+		Name    *string  `json:"name"`
 	}
 	JSON500 *struct {
-		CompetitionName *string  `json:"competitionName"`
-		Message         *Message `json:"message,omitempty"`
+		CompId  *string  `json:"compId"`
+		Message *Message `json:"message,omitempty"`
+		Name    *string  `json:"name"`
 	}
 }
 
@@ -272,8 +275,9 @@ func ParseCrawlCompResponse(rsp *http.Response) (*CrawlCompResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest struct {
-			CompetitionName *string  `json:"competitionName"`
-			Message         *Message `json:"message,omitempty"`
+			CompId  *string  `json:"compId"`
+			Message *Message `json:"message,omitempty"`
+			Name    *string  `json:"name"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -282,8 +286,9 @@ func ParseCrawlCompResponse(rsp *http.Response) (*CrawlCompResponse, error) {
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest struct {
-			CompetitionName *string  `json:"competitionName"`
-			Message         *Message `json:"message,omitempty"`
+			CompId  *string  `json:"compId"`
+			Message *Message `json:"message,omitempty"`
+			Name    *string  `json:"name"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -292,8 +297,9 @@ func ParseCrawlCompResponse(rsp *http.Response) (*CrawlCompResponse, error) {
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
-			CompetitionName *string  `json:"competitionName"`
-			Message         *Message `json:"message,omitempty"`
+			CompId  *string  `json:"compId"`
+			Message *Message `json:"message,omitempty"`
+			Name    *string  `json:"name"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err

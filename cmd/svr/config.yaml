@@ -6,6 +6,13 @@ ClientConfig:
   IdleConnTimeout: 30
   MaxIdleConsPerHost: 1
   MaxConsPerHost: 1
+DatabaseConfigs:
+  - Name: "PSQL"
+    Database: "rugby_db"
+    Server: "localhost:5432"
+    Username: "postgres"
+    Password: "password"
+    Scheme: "postgres"
 CrawlerConfigs:
   - Name: "COLLY"
     AppsJSONPath: ""
