@@ -6,7 +6,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/NYTimes/gziphandler v1.1.1
 	github.com/calebtracey/config-yaml v1.0.3
-	github.com/calebtracey/rugby-models v0.0.2
+	github.com/calebtracey/rugby-models v0.0.3
 	github.com/getkin/kin-openapi v0.109.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/gocolly/colly v1.2.0
