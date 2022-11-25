@@ -14,7 +14,7 @@ components:
               date:
                 nullable: true
                 type: string
-      description: Request used for scraping competition leaderboard data
+      description: Request used for scraping competition comp data
       required: true
   responses:
     CrawlLeaderboardResponse:
@@ -33,7 +33,7 @@ components:
                 type: string
               teams:
                 $ref: '#/components/schemas/TeamLeaderboardDataList'
-      description: Response with competition leaderboard crawl results
+      description: Response with competition comp crawl results
   schemas:
     CrawlLeaderboardRequest:
       properties:

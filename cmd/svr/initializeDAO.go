@@ -2,7 +2,7 @@ package main
 
 import (
 	config "github.com/calebtracey/config-yaml"
-	compdao "github.com/calebtracey/rugby-crawler-api/internal/dao/leaderboard"
+	compdao "github.com/calebtracey/rugby-crawler-api/internal/dao/comp"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/psql"
 	"github.com/calebtracey/rugby-crawler-api/internal/facade"
 	"github.com/calebtracey/rugby-crawler-api/internal/facade/comp"
@@ -26,10 +26,10 @@ func initializeDAO(config config.Config) (facade.APIFacadeI, error) {
 			DbDAO: psql.DAO{
 				Db: psqlDbConfig.DB,
 			},
-			LeaderboardDAO: compdao.DAO{
+			CompDAO: compdao.DAO{
 				Collector: crawlerConfig.Collector,
 			},
-			LeaderboardMapper: compdao.Mapper{},
+			CompMapper: compdao.Mapper{},
 		},
 	}, nil
 }

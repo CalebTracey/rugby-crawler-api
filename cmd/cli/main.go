@@ -14,7 +14,7 @@ func main() {
 	}
 
 	compId := "123"
-	compName := "test leaderboard"
+	compName := "test comp"
 	date := "2022/12/12"
 	respC, err := client.CrawlCompWithResponse(context.Background(),
 		openapi3.CrawlCompJSONRequestBody{

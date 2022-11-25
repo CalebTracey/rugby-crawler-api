@@ -1,4 +1,4 @@
-package leaderboard
+package comp
 
 import (
 	"github.com/calebtracey/rugby-crawler-api/external/models"

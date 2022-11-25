@@ -8,7 +8,7 @@ import (
 	"github.com/calebtracey/rugby-crawler-api/external/models"
 	"github.com/calebtracey/rugby-crawler-api/external/models/request"
 	"github.com/calebtracey/rugby-crawler-api/external/models/response"
-	"github.com/calebtracey/rugby-crawler-api/internal/dao/leaderboard"
+	"github.com/calebtracey/rugby-crawler-api/internal/dao/comp"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/psql"
 	"github.com/calebtracey/rugby-crawler-api/internal/mocks/compmocks"
 	"github.com/calebtracey/rugby-crawler-api/internal/mocks/dbmocks"
@@ -25,9 +25,9 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 	mockLeaderboardDAO := compmocks.NewMockDAOI(ctrl)
 	mockLeaderboardMapper := compmocks.NewMockMapperI(ctrl)
 	type fields struct {
-		DbDAO             psql.DAOI
-		LeaderboardDAO    leaderboard.DAOI
-		LeaderboardMapper leaderboard.MapperI
+		DbDAO      psql.DAOI
+		CompDAO    comp.DAOI
+		CompMapper comp.MapperI
 	}
 	type args struct {
 		ctx context.Context
@@ -50,9 +50,9 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 		{
 			name: "Happy Path",
 			fields: fields{
-				DbDAO:             mockDbDao,
-				LeaderboardDAO:    mockLeaderboardDAO,
-				LeaderboardMapper: mockLeaderboardMapper,
+				DbDAO:      mockDbDao,
+				CompDAO:    mockLeaderboardDAO,
+				CompMapper: mockLeaderboardMapper,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -87,9 +87,9 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 		{
 			name: "Sad Path - crawl error",
 			fields: fields{
-				DbDAO:             mockDbDao,
-				LeaderboardDAO:    mockLeaderboardDAO,
-				LeaderboardMapper: mockLeaderboardMapper,
+				DbDAO:      mockDbDao,
+				CompDAO:    mockLeaderboardDAO,
+				CompMapper: mockLeaderboardMapper,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -138,9 +138,9 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 		{
 			name: "Sad Path - database error",
 			fields: fields{
-				DbDAO:             mockDbDao,
-				LeaderboardDAO:    mockLeaderboardDAO,
-				LeaderboardMapper: mockLeaderboardMapper,
+				DbDAO:      mockDbDao,
+				CompDAO:    mockLeaderboardDAO,
+				CompMapper: mockLeaderboardMapper,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -187,9 +187,9 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := Facade{
-				DbDAO:             tt.fields.DbDAO,
-				LeaderboardDAO:    tt.fields.LeaderboardDAO,
-				LeaderboardMapper: tt.fields.LeaderboardMapper,
+				DbDAO:      tt.fields.DbDAO,
+				CompDAO:    tt.fields.CompDAO,
+				CompMapper: tt.fields.CompMapper,
 			}
 			mock.ExpectBegin()
 			mockLeaderboardMapper.EXPECT().BuildCrawlerUrl(gomock.Any()).Return(tt.url)

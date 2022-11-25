@@ -136,7 +136,7 @@ func NewOpenAPI3() openapi3.T {
 	swagger.Components.RequestBodies = openapi3.RequestBodies{
 		"CrawlLeaderboardRequest": &openapi3.RequestBodyRef{
 			Value: openapi3.NewRequestBody().
-				WithDescription("Request used for scraping competition leaderboard data").
+				WithDescription("Request used for scraping competition comp data").
 				WithRequired(true).
 				WithJSONSchema(openapi3.NewSchema().
 					WithProperty("compId", openapi3.NewStringSchema().
@@ -151,7 +151,7 @@ func NewOpenAPI3() openapi3.T {
 	swagger.Components.Responses = openapi3.Responses{
 		"CrawlLeaderboardResponse": &openapi3.ResponseRef{
 			Value: openapi3.NewResponse().
-				WithDescription("Response with competition leaderboard crawl results").
+				WithDescription("Response with competition comp crawl results").
 				WithContent(openapi3.NewContentWithJSONSchema(openapi3.NewSchema().
 					WithProperty("compId", openapi3.NewStringSchema().
 						WithNullable()).

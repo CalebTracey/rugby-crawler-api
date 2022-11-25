@@ -63,7 +63,7 @@ func (h *Handler) CompetitionHandler() http.HandlerFunc {
 			return
 		}
 
-		compResponse = h.Service.CompetitionCrawlData(r.Context(), compRequest)
+		compResponse = h.Service.CrawlLeaderboardData(r.Context(), compRequest)
 	}
 }
 
