@@ -10,8 +10,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const LeagueIDSixNations = "180659"
-
 //go:generate mockgen -destination=mockFacade.go -package=comp . FacadeI
 type FacadeI interface {
 	CrawlLeaderboard(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse)
