@@ -1,7 +1,7 @@
 # rugby-crawler-api
 
 ### Go REST API for scraping rugby stats
-### [Swagger Docs](https://calebtracey.github.io/rugby-crawler-api/)
+### [Swagger Docs](https://calebtracey.github.io/rugby-crawler-api/swagger-ui/)
 ---
 
 **Includes the following:**
