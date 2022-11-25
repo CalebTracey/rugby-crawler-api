@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/comp"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/psql"
-	"github.com/calebtracey/rugby-models/request"
-	"github.com/calebtracey/rugby-models/response"
+	"github.com/calebtracey/rugby-models/pkg/dtos/request"
+	"github.com/calebtracey/rugby-models/pkg/dtos/response"
 	log "github.com/sirupsen/logrus"
 	"strings"
 )

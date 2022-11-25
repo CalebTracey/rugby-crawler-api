@@ -6,11 +6,10 @@ package mocks
 
 import (
 	context "context"
-	reflect "reflect"
-
-	request "github.com/calebtracey/rugby-models/request"
-	response "github.com/calebtracey/rugby-models/response"
+	request "github.com/calebtracey/rugby-models/pkg/dtos/request"
+	response "github.com/calebtracey/rugby-models/pkg/dtos/response"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
 // MockAPIFacadeI is a mock of APIFacadeI interface.

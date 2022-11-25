@@ -1,8 +1,8 @@
 package comp
 
 import (
-	"github.com/calebtracey/rugby-models/models"
-	"github.com/calebtracey/rugby-models/response"
+	"github.com/calebtracey/rugby-models/pkg/dtos"
+	"github.com/calebtracey/rugby-models/pkg/dtos/response"
 	"github.com/gocolly/colly"
 	log "github.com/sirupsen/logrus"
 	"regexp"
@@ -22,7 +22,7 @@ func (s DAO) CrawlLeaderboardData(url string) (resp response.LeaderboardResponse
 		re := regexp.MustCompile("[0-9]+")
 		e.ForEach("tr", func(_ int, el *colly.HTMLElement) {
 			href := el.ChildAttr("a.react-router-link", "href")
-			team := models.TeamLeaderboardData{
+			team := dtos.TeamLeaderboardData{
 				Id:                re.FindAllString(href, -1)[0],
 				Name:              el.ChildText("span.team-names"),
 				GamesPlayed:       el.ChildText("td:nth-child(2)"),
