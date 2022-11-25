@@ -2,7 +2,7 @@ package comp
 
 import (
 	"fmt"
-	"github.com/calebtracey/rugby-models/models"
+	"github.com/calebtracey/rugby-models/pkg/dtos"
 	log "github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
@@ -12,8 +12,8 @@ import (
 type MapperI interface {
 	BuildCrawlerUrl(teamId string) string
 	MapAddPSQLCompetitionData(compId, name string, teamIds []string) string
-	CreateUpdateLeaderboardExec(compIdStr, compName string, td models.TeamLeaderboardData) string
-	CreateInsertLeaderboardExec(compIdStr, compName string, td models.TeamLeaderboardData) string
+	CreateUpdateLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string
+	CreateInsertLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string
 }
 
 type Mapper struct{}
@@ -26,7 +26,7 @@ func (m Mapper) MapAddPSQLCompetitionData(compId, name string, teamIds []string)
 	return fmt.Sprintf(PSQLAddCompetitionData, compId, name, teamIds)
 }
 
-func (m Mapper) CreateUpdateLeaderboardExec(compIdStr, compName string, td models.TeamLeaderboardData) string {
+func (m Mapper) CreateUpdateLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string {
 	compId, err := strconv.Atoi(compIdStr)
 	if err != nil {
 		log.Error(err)
@@ -41,7 +41,7 @@ func (m Mapper) CreateUpdateLeaderboardExec(compIdStr, compName string, td model
 		td.BonusPointsLosing, td.BonusPoints, td.PointsDiff, td.Points, compId)
 }
 
-func (m Mapper) CreateInsertLeaderboardExec(compIdStr, compName string, td models.TeamLeaderboardData) string {
+func (m Mapper) CreateInsertLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string {
 	compId, err := strconv.Atoi(compIdStr)
 	if err != nil {
 		log.Error(err)

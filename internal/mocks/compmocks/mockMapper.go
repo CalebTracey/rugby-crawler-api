@@ -5,10 +5,9 @@
 package compmocks
 
 import (
-	reflect "reflect"
-
-	models "github.com/calebtracey/rugby-models/models"
+	models "github.com/calebtracey/rugby-models/pkg/dtos"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
 // MockMapperI is a mock of MapperI interface.

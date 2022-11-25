@@ -9,9 +9,9 @@ import (
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/psql"
 	"github.com/calebtracey/rugby-crawler-api/internal/mocks/compmocks"
 	"github.com/calebtracey/rugby-crawler-api/internal/mocks/dbmocks"
-	"github.com/calebtracey/rugby-models/models"
-	"github.com/calebtracey/rugby-models/request"
-	"github.com/calebtracey/rugby-models/response"
+	"github.com/calebtracey/rugby-models/pkg/dtos"
+	"github.com/calebtracey/rugby-models/pkg/dtos/request"
+	"github.com/calebtracey/rugby-models/pkg/dtos/response"
 	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
@@ -65,7 +65,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			wantCrawlResp: response.LeaderboardResponse{
 				Id:   "180659",
 				Name: "Six Nations",
-				Teams: models.TeamLeaderboardDataList{
+				Teams: dtos.TeamLeaderboardDataList{
 					{},
 				},
 				Message: response.Message{},
@@ -73,7 +73,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			wantResp: response.LeaderboardResponse{
 				Id:   "180659",
 				Name: "Six Nations",
-				Teams: models.TeamLeaderboardDataList{
+				Teams: dtos.TeamLeaderboardDataList{
 					{},
 				},
 				Message: response.Message{},
@@ -153,7 +153,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			wantCrawlResp: response.LeaderboardResponse{
 				Id:   "180659",
 				Name: "Six Nations",
-				Teams: models.TeamLeaderboardDataList{
+				Teams: dtos.TeamLeaderboardDataList{
 					{},
 				},
 				Message: response.Message{},
