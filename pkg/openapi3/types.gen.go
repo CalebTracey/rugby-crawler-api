@@ -47,27 +47,29 @@ type TeamLeaderboardData struct {
 // TeamLeaderboardDataList defines model for TeamLeaderboardDataList.
 type TeamLeaderboardDataList = []TeamLeaderboardData
 
-// CrawlLeaderboardResponse defines model for CrawlLeaderboardResponse.
-type CrawlLeaderboardResponse struct {
-	CompId  *string                  `json:"compId"`
+// LeaderboardResponse defines model for LeaderboardResponse.
+type LeaderboardResponse struct {
+	Id      *string                  `json:"id"`
 	Message *Message                 `json:"message,omitempty"`
-	Name    *string                  `json:"name"`
+	Name    *string                  `json:"name,omitempty"`
 	Teams   *TeamLeaderboardDataList `json:"teams,omitempty"`
 }
 
-// CrawlLeaderboardRequest defines model for CrawlLeaderboardRequest.
-type CrawlLeaderboardRequest struct {
-	CompId   *string `json:"compId"`
+// LeaderboardRequest defines model for LeaderboardRequest.
+type LeaderboardRequest struct {
+	CompId   *string `json:"compId,omitempty"`
 	CompName *string `json:"compName,omitempty"`
-	Date     *string `json:"date"`
+	Date     *string `json:"date,omitempty"`
+	Source   *string `json:"source,omitempty"`
 }
 
-// CrawlCompJSONBody defines parameters for CrawlComp.
-type CrawlCompJSONBody struct {
-	CompId   *string `json:"compId"`
+// GetLeaderboardDataJSONBody defines parameters for GetLeaderboardData.
+type GetLeaderboardDataJSONBody struct {
+	CompId   *string `json:"compId,omitempty"`
 	CompName *string `json:"compName,omitempty"`
-	Date     *string `json:"date"`
+	Date     *string `json:"date,omitempty"`
+	Source   *string `json:"source,omitempty"`
 }
 
-// CrawlCompJSONRequestBody defines body for CrawlComp for application/json ContentType.
-type CrawlCompJSONRequestBody CrawlCompJSONBody
+// GetLeaderboardDataJSONRequestBody defines body for GetLeaderboardData for application/json ContentType.
+type GetLeaderboardDataJSONRequestBody GetLeaderboardDataJSONBody

@@ -3,7 +3,7 @@ package psql
 import (
 	"context"
 	"database/sql"
-	"github.com/calebtracey/rugby-crawler-api/external/models/response"
+	"github.com/calebtracey/rugby-models/response"
 	log "github.com/sirupsen/logrus"
 )
 

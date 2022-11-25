@@ -2,10 +2,10 @@ package routes
 
 import (
 	"encoding/json"
-	request2 "github.com/calebtracey/rugby-crawler-api/external/models/request"
-	"github.com/calebtracey/rugby-crawler-api/external/models/response"
 	"github.com/calebtracey/rugby-crawler-api/internal/facade"
 	_ "github.com/calebtracey/rugby-crawler-api/internal/routes/statik"
+	"github.com/calebtracey/rugby-models/request"
+	"github.com/calebtracey/rugby-models/response"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	log "github.com/sirupsen/logrus"
@@ -25,7 +25,7 @@ func (h *Handler) InitializeRoutes() *mux.Router {
 	// Health check
 	r.Handle("/health", h.HealthCheck()).Methods(http.MethodGet)
 
-	r.Handle("/competition", h.CompetitionHandler()).Methods(http.MethodPost)
+	r.Handle("/leaderboard", h.LeaderboardHandler()).Methods(http.MethodPost)
 
 	staticFs, err := fs.New()
 	if err != nil {
@@ -39,11 +39,11 @@ func (h *Handler) InitializeRoutes() *mux.Router {
 	return r
 }
 
-func (h *Handler) CompetitionHandler() http.HandlerFunc {
+func (h *Handler) LeaderboardHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
-		var compResponse response.CrawlLeaderboardResponse
-		var compRequest request2.CrawlLeaderboardRequest
+		var compResponse response.LeaderboardResponse
+		var compRequest request.LeaderboardRequest
 		defer func() {
 			status, _ := strconv.Atoi(compResponse.Message.Status)
 			hn, _ := os.Hostname()

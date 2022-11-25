@@ -2,17 +2,17 @@ package comp
 
 import (
 	"context"
-	"github.com/calebtracey/rugby-crawler-api/external/models/request"
-	"github.com/calebtracey/rugby-crawler-api/external/models/response"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/comp"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/psql"
+	"github.com/calebtracey/rugby-models/request"
+	"github.com/calebtracey/rugby-models/response"
 	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
 //go:generate mockgen -destination=../../mocks/compmocks/mockFacade.go -package=compmocks . FacadeI
 type FacadeI interface {
-	CrawlLeaderboard(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse)
+	CrawlLeaderboard(ctx context.Context, req request.LeaderboardRequest) (resp response.LeaderboardResponse)
 }
 
 type Facade struct {
@@ -21,13 +21,13 @@ type Facade struct {
 	CompMapper comp.MapperI
 }
 
-func (s Facade) CrawlLeaderboard(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse) {
+func (s Facade) CrawlLeaderboard(ctx context.Context, req request.LeaderboardRequest) (resp response.LeaderboardResponse) {
 	compId := getCompId(req.CompName)
 	url := s.CompMapper.BuildCrawlerUrl(compId)
 	resp, err := s.CompDAO.CrawlLeaderboardData(url)
 	if err != nil {
 		log.Error(err)
-		return response.CrawlLeaderboardResponse{
+		return response.LeaderboardResponse{
 			Message: response.Message{
 				ErrorLog: response.ErrorLogs{
 					*err,
@@ -41,7 +41,7 @@ func (s Facade) CrawlLeaderboard(ctx context.Context, req request.CrawlLeaderboa
 		_, dbErr := s.DbDAO.InsertOne(ctx, exec)
 		if dbErr != nil {
 			log.Error(dbErr)
-			return response.CrawlLeaderboardResponse{
+			return response.LeaderboardResponse{
 				Message: response.Message{
 					ErrorLog: response.ErrorLogs{
 						*dbErr,

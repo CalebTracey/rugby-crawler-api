@@ -1,66 +1,42 @@
 components:
   requestBodies:
-    CrawlLeaderboardRequest:
+    LeaderboardRequest:
       content:
         application/json:
           schema:
             properties:
               compId:
-                nullable: true
+                minLength: 1
                 type: string
               compName:
                 minLength: 1
                 type: string
               date:
-                nullable: true
+                minLength: 1
                 type: string
-      description: Request used for scraping competition comp data
+              source:
+                minLength: 1
+                type: string
+      description: Request used for fetching leaderboard data
       required: true
   responses:
-    CrawlLeaderboardResponse:
+    LeaderboardResponse:
       content:
         application/json:
           schema:
             nullable: true
             properties:
-              compId:
+              id:
                 nullable: true
                 type: string
               message:
                 $ref: '#/components/schemas/Message'
               name:
-                nullable: true
                 type: string
               teams:
                 $ref: '#/components/schemas/TeamLeaderboardDataList'
-      description: Response with competition comp crawl results
+      description: Response with competition data
   schemas:
-    CrawlLeaderboardRequest:
-      properties:
-        compId:
-          nullable: true
-          type: string
-        compName:
-          nullable: true
-          type: string
-        date:
-          nullable: true
-          type: string
-      type: object
-    CrawlLeaderboardResponse:
-      nullable: true
-      properties:
-        compId:
-          nullable: true
-          type: string
-        message:
-          $ref: '#/components/schemas/Message'
-        name:
-          nullable: true
-          type: string
-        teams:
-          $ref: '#/components/schemas/TeamLeaderboardDataList'
-      type: object
     ErrorLog:
       properties:
         query:
@@ -100,6 +76,67 @@ components:
           nullable: true
           type: string
       type: object
+    PSQLLeaderboardData:
+      properties:
+        bonus_points:
+          nullable: true
+          type: string
+        bonus_points_losing:
+          nullable: true
+          type: string
+        bonus_points_try:
+          nullable: true
+          type: string
+        bye:
+          nullable: true
+          type: string
+        comp_id:
+          nullable: true
+          type: string
+        comp_name:
+          nullable: true
+          type: string
+        draw_count:
+          nullable: true
+          type: string
+        games_played:
+          nullable: true
+          type: string
+        loss_count:
+          nullable: true
+          type: string
+        points:
+          nullable: true
+          type: string
+        points_against:
+          nullable: true
+          type: string
+        points_diff:
+          nullable: true
+          type: string
+        points_for:
+          nullable: true
+          type: string
+        team_id:
+          nullable: true
+          type: string
+        team_name:
+          nullable: true
+          type: string
+        tries_against:
+          nullable: true
+          type: string
+        tries_for:
+          nullable: true
+          type: string
+        win_count:
+          nullable: true
+          type: string
+      type: object
+    PSQLLeaderboardDataList:
+      items:
+        $ref: '#/components/schemas/PSQLLeaderboardData'
+      type: array
     TeamLeaderboardData:
       properties:
         bonusPoints:
@@ -166,20 +203,19 @@ info:
   version: 0.0.0
 openapi: 3.0.0
 paths:
-  /competition:
-    description: Crawl Competition
+  /leaderboard:
+    description: Leaderboard Data
     post:
-      operationId: CrawlComp
+      operationId: GetLeaderboardData
       requestBody:
-        $ref: '#/components/requestBodies/CrawlLeaderboardRequest'
+        $ref: '#/components/requestBodies/LeaderboardRequest'
       responses:
         "201":
-          $ref: '#/components/responses/CrawlLeaderboardResponse'
+          $ref: '#/components/responses/LeaderboardResponse'
         "400":
-          $ref: '#/components/responses/CrawlLeaderboardResponse'
+          $ref: '#/components/responses/LeaderboardResponse'
         "500":
-          $ref: '#/components/responses/CrawlLeaderboardResponse'
-    summary: Crawl Requests
+          $ref: '#/components/responses/LeaderboardResponse'
 servers:
 - description: Local development
   url: http://0.0.0.0:6080

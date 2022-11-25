@@ -5,13 +5,13 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/calebtracey/rugby-crawler-api/external/models"
-	"github.com/calebtracey/rugby-crawler-api/external/models/request"
-	"github.com/calebtracey/rugby-crawler-api/external/models/response"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/comp"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/psql"
 	"github.com/calebtracey/rugby-crawler-api/internal/mocks/compmocks"
 	"github.com/calebtracey/rugby-crawler-api/internal/mocks/dbmocks"
+	"github.com/calebtracey/rugby-models/models"
+	"github.com/calebtracey/rugby-models/request"
+	"github.com/calebtracey/rugby-models/response"
 	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
@@ -31,7 +31,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		req request.CrawlLeaderboardRequest
+		req request.LeaderboardRequest
 	}
 	tests := []struct {
 		name                  string
@@ -39,8 +39,8 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 		args                  args
 		exec                  string
 		url                   string
-		wantResp              response.CrawlLeaderboardResponse
-		wantCrawlResp         response.CrawlLeaderboardResponse
+		wantResp              response.LeaderboardResponse
+		wantCrawlResp         response.LeaderboardResponse
 		mockDbRes             sql.Result
 		mockDbErr             *response.ErrorLog
 		mockLeaderboardDAOErr *response.ErrorLog
@@ -56,23 +56,23 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				req: request.CrawlLeaderboardRequest{
+				req: request.LeaderboardRequest{
 					CompName: "Six Nations",
 				},
 			},
 			exec: ``,
 			url:  "https://test.url",
-			wantCrawlResp: response.CrawlLeaderboardResponse{
-				CompId: "180659",
-				Name:   "Six Nations",
+			wantCrawlResp: response.LeaderboardResponse{
+				Id:   "180659",
+				Name: "Six Nations",
 				Teams: models.TeamLeaderboardDataList{
 					{},
 				},
 				Message: response.Message{},
 			},
-			wantResp: response.CrawlLeaderboardResponse{
-				CompId: "180659",
-				Name:   "Six Nations",
+			wantResp: response.LeaderboardResponse{
+				Id:   "180659",
+				Name: "Six Nations",
 				Teams: models.TeamLeaderboardDataList{
 					{},
 				},
@@ -93,13 +93,13 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				req: request.CrawlLeaderboardRequest{
+				req: request.LeaderboardRequest{
 					CompName: "Six Nations",
 				},
 			},
 			exec: ``,
 			url:  "https://test.url",
-			wantCrawlResp: response.CrawlLeaderboardResponse{
+			wantCrawlResp: response.LeaderboardResponse{
 				Message: response.Message{
 					ErrorLog: response.ErrorLogs{
 						{
@@ -110,7 +110,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 					},
 				},
 			},
-			wantResp: response.CrawlLeaderboardResponse{
+			wantResp: response.LeaderboardResponse{
 				Message: response.Message{
 					ErrorLog: response.ErrorLogs{
 						{
@@ -144,21 +144,21 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				req: request.CrawlLeaderboardRequest{
+				req: request.LeaderboardRequest{
 					CompName: "Six Nations",
 				},
 			},
 			exec: ``,
 			url:  "https://test.url",
-			wantCrawlResp: response.CrawlLeaderboardResponse{
-				CompId: "180659",
-				Name:   "Six Nations",
+			wantCrawlResp: response.LeaderboardResponse{
+				Id:   "180659",
+				Name: "Six Nations",
 				Teams: models.TeamLeaderboardDataList{
 					{},
 				},
 				Message: response.Message{},
 			},
-			wantResp: response.CrawlLeaderboardResponse{
+			wantResp: response.LeaderboardResponse{
 				Message: response.Message{
 					ErrorLog: response.ErrorLogs{
 						{
@@ -194,7 +194,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			mock.ExpectBegin()
 			mockLeaderboardMapper.EXPECT().BuildCrawlerUrl(gomock.Any()).Return(tt.url)
 			mockLeaderboardDAO.EXPECT().CrawlLeaderboardData(tt.url).
-				DoAndReturn(func(url string) (response.CrawlLeaderboardResponse, *response.ErrorLog) {
+				DoAndReturn(func(url string) (response.LeaderboardResponse, *response.ErrorLog) {
 					if tt.expectCrawlError {
 						return tt.wantCrawlResp, tt.mockLeaderboardDAOErr
 					}

@@ -1,8 +1,8 @@
 package comp
 
 import (
-	"github.com/calebtracey/rugby-crawler-api/external/models"
-	"github.com/calebtracey/rugby-crawler-api/external/models/response"
+	"github.com/calebtracey/rugby-models/models"
+	"github.com/calebtracey/rugby-models/response"
 	"github.com/gocolly/colly"
 	log "github.com/sirupsen/logrus"
 	"regexp"
@@ -10,14 +10,14 @@ import (
 
 //go:generate mockgen -destination=../../mocks/compmocks/mockDao.go -package=compmocks . DAOI
 type DAOI interface {
-	CrawlLeaderboardData(url string) (resp response.CrawlLeaderboardResponse, log *response.ErrorLog)
+	CrawlLeaderboardData(url string) (resp response.LeaderboardResponse, log *response.ErrorLog)
 }
 
 type DAO struct {
 	Collector *colly.Collector
 }
 
-func (s DAO) CrawlLeaderboardData(url string) (resp response.CrawlLeaderboardResponse, errLog *response.ErrorLog) {
+func (s DAO) CrawlLeaderboardData(url string) (resp response.LeaderboardResponse, errLog *response.ErrorLog) {
 	s.Collector.OnHTML("table.standings > tbody", func(e *colly.HTMLElement) {
 		re := regexp.MustCompile("[0-9]+")
 		e.ForEach("tr", func(_ int, el *colly.HTMLElement) {

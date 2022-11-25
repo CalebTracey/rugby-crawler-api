@@ -7,7 +7,7 @@ package compmocks
 import (
 	reflect "reflect"
 
-	response "github.com/calebtracey/rugby-crawler-api/external/models/response"
+	response "github.com/calebtracey/rugby-models/response"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -35,10 +35,10 @@ func (m *MockDAOI) EXPECT() *MockDAOIMockRecorder {
 }
 
 // CrawlLeaderboardData mocks base method.
-func (m *MockDAOI) CrawlLeaderboardData(arg0 string) (response.CrawlLeaderboardResponse, *response.ErrorLog) {
+func (m *MockDAOI) CrawlLeaderboardData(arg0 string) (response.LeaderboardResponse, *response.ErrorLog) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CrawlLeaderboardData", arg0)
-	ret0, _ := ret[0].(response.CrawlLeaderboardResponse)
+	ret0, _ := ret[0].(response.LeaderboardResponse)
 	ret1, _ := ret[1].(*response.ErrorLog)
 	return ret0, ret1
 }

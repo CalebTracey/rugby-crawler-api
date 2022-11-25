@@ -8,8 +8,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	request "github.com/calebtracey/rugby-crawler-api/external/models/request"
-	response "github.com/calebtracey/rugby-crawler-api/external/models/response"
+	request "github.com/calebtracey/rugby-models/request"
+	response "github.com/calebtracey/rugby-models/response"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -37,10 +37,10 @@ func (m *MockFacadeI) EXPECT() *MockFacadeIMockRecorder {
 }
 
 // CrawlLeaderboard mocks base method.
-func (m *MockFacadeI) CrawlLeaderboard(arg0 context.Context, arg1 request.CrawlLeaderboardRequest) response.CrawlLeaderboardResponse {
+func (m *MockFacadeI) CrawlLeaderboard(arg0 context.Context, arg1 request.LeaderboardRequest) response.LeaderboardResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CrawlLeaderboard", arg0, arg1)
-	ret0, _ := ret[0].(response.CrawlLeaderboardResponse)
+	ret0, _ := ret[0].(response.LeaderboardResponse)
 	return ret0
 }
 
