@@ -14,7 +14,7 @@ const LeagueIDSixNations = "180659"
 
 //go:generate mockgen -destination=mockFacade.go -package=comp . FacadeI
 type FacadeI interface {
-	CompetitionCrawl(ctx context.Context, req request.CompetitionCrawlRequest) (resp response.CompetitionCrawlResponse)
+	CrawlLeaderboard(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse)
 }
 
 type Facade struct {
@@ -23,14 +23,14 @@ type Facade struct {
 	CompMapper comp.MapperI
 }
 
-func (s Facade) CompetitionCrawl(ctx context.Context, req request.CompetitionCrawlRequest) (resp response.CompetitionCrawlResponse) {
+func (s Facade) CrawlLeaderboard(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse) {
 	//TODO create scrape url
-	url := ""
-	resp, err := s.CompDAO.CompCrawlData(ctx, url, req.Date)
+	url := s.CompMapper.BuildCrawlerUrl(req.CompId)
+	resp, err := s.CompDAO.CrawlLeaderboardData(url)
 	if err != nil {
 
 		log.Error(err)
-		return response.CompetitionCrawlResponse{
+		return response.CrawlLeaderboardResponse{
 			Message: response.Message{
 				ErrorLog: response.ErrorLogs{
 					*err,
@@ -38,18 +38,18 @@ func (s Facade) CompetitionCrawl(ctx context.Context, req request.CompetitionCra
 			},
 		}
 	}
-	compExec := s.CompMapper.MapAddCompetitionData(resp.CompId, resp.Name, resp.TeamIds)
-	_, dbErr := s.DBDAO.InsertOne(ctx, compExec)
-	if dbErr != nil {
-		log.Error(dbErr)
-		return response.CompetitionCrawlResponse{
-			Message: response.Message{
-				ErrorLog: response.ErrorLogs{
-					*dbErr,
-				},
-			},
-		}
-	}
+	//compExec := s.CompMapper.MapAddPSQLCompetitionData(resp.CompId, resp.Name, resp.TeamIds)
+	//_, dbErr := s.DBDAO.InsertOne(ctx, compExec)
+	//if dbErr != nil {
+	//	log.Error(dbErr)
+	//	return response.CrawlLeaderboardResponse{
+	//		Message: response.Message{
+	//			ErrorLog: response.ErrorLogs{
+	//				*dbErr,
+	//			},
+	//		},
+	//	}
+	//}
 	//TODO add response mapping
 	return resp
 }

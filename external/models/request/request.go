@@ -1,6 +1,6 @@
 package request
 
-type CompetitionCrawlRequest struct {
-	CompetitionID string `json:"competitionID,omitempty"`
-	Date          string `json:"date,omitempty"`
+type CrawlLeaderboardRequest struct {
+	CompId string `json:"compId,omitempty"`
+	Date   string `json:"date,omitempty"`
 }

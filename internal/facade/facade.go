@@ -7,17 +7,19 @@ import (
 	"github.com/calebtracey/rugby-crawler-api/internal/facade/comp"
 )
 
+//TODO create response object to contain leaderboard data + all other data
+
 type APIFacadeI interface {
-	CompetitionCrawlData(ctx context.Context, req request.CompetitionCrawlRequest) (resp response.CompetitionCrawlResponse)
+	CompetitionCrawlData(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse)
 }
 
 type APIFacade struct {
 	CompService comp.FacadeI
 }
 
-func (s APIFacade) CompetitionCrawlData(ctx context.Context, req request.CompetitionCrawlRequest) (resp response.CompetitionCrawlResponse) {
+func (s APIFacade) CompetitionCrawlData(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse) {
 	//TODO add validation
-	resp = s.CompService.CompetitionCrawl(ctx, req)
+	resp = s.CompService.CrawlLeaderboard(ctx, req)
 
 	return resp
 }

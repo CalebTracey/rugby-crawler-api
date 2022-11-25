@@ -39,6 +39,46 @@ func NewOpenAPI3() openapi3.T {
 	}
 
 	swagger.Components.Schemas = openapi3.Schemas{
+		"Team": openapi3.NewSchemaRef("",
+			openapi3.NewObjectSchema().
+				WithProperty("id", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("name", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("gamesPlayed", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("winCount", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("drawCount", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("lossCount", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("bye", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("pointsFor", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("pointsAgainst", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("triesFor", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("triesAgainst", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("bonusPointsTry", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("bonusPointsLosing", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("bonusPoints", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("pointsDiff", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("points", openapi3.NewStringSchema().
+					WithNullable())),
+		"TeamList": openapi3.NewArraySchema().
+			WithItems(&openapi3.Schema{
+				Type: openapi3.TypeArray,
+				Items: &openapi3.SchemaRef{
+					Ref: "#/components/schemas/Team",
+				}}).Items,
 		"CompetitionCrawlRequest": openapi3.NewSchemaRef("",
 			openapi3.NewObjectSchema().
 				WithProperty("competitionID", openapi3.NewStringSchema()).
@@ -49,10 +89,9 @@ func NewOpenAPI3() openapi3.T {
 					WithNullable()).
 				WithProperty("name", openapi3.NewStringSchema().
 					WithNullable()).
-				WithProperty("teamIds", openapi3.NewArraySchema().
-					WithItems(&openapi3.Schema{
-						Type: openapi3.TypeString,
-					})).
+				WithPropertyRef("teams", &openapi3.SchemaRef{
+					Ref: "#/components/schemas/TeamList",
+				}).
 				WithPropertyRef("message", &openapi3.SchemaRef{
 					Ref: "#/components/schemas/Message",
 				}).
@@ -91,12 +130,12 @@ func NewOpenAPI3() openapi3.T {
 	}
 
 	swagger.Components.RequestBodies = openapi3.RequestBodies{
-		"CompetitionCrawlRequest": &openapi3.RequestBodyRef{
+		"CrawlLeaderboardRequest": &openapi3.RequestBodyRef{
 			Value: openapi3.NewRequestBody().
-				WithDescription("Request used for crawling competition data").
+				WithDescription("Request used for scraping competition leaderboard data").
 				WithRequired(true).
 				WithJSONSchema(openapi3.NewSchema().
-					WithProperty("competitionID", openapi3.NewStringSchema().
+					WithProperty("compId", openapi3.NewStringSchema().
 						WithMinLength(1)).
 					WithProperty("date", openapi3.NewStringSchema().
 						WithMinLength(1))),
@@ -104,9 +143,9 @@ func NewOpenAPI3() openapi3.T {
 	}
 
 	swagger.Components.Responses = openapi3.Responses{
-		"CompetitionCrawlResponse": &openapi3.ResponseRef{
+		"CrawlLeaderboardResponse": &openapi3.ResponseRef{
 			Value: openapi3.NewResponse().
-				WithDescription("Response with competition crawl results").
+				WithDescription("Response with competition leaderboard crawl results").
 				WithContent(openapi3.NewContentWithJSONSchema(openapi3.NewSchema().
 					WithProperty("compId", openapi3.NewStringSchema().
 						WithNullable()).
@@ -130,17 +169,17 @@ func NewOpenAPI3() openapi3.T {
 			Post: &openapi3.Operation{
 				OperationID: "CrawlComp",
 				RequestBody: &openapi3.RequestBodyRef{
-					Ref: "#/components/requestBodies/CompetitionCrawlRequest",
+					Ref: "#/components/requestBodies/CrawlLeaderboardRequest",
 				},
 				Responses: openapi3.Responses{
 					"400": &openapi3.ResponseRef{
-						Ref: "#/components/responses/CompetitionCrawlResponse",
+						Ref: "#/components/responses/CrawlLeaderboardResponse",
 					},
 					"500": &openapi3.ResponseRef{
-						Ref: "#/components/responses/CompetitionCrawlResponse",
+						Ref: "#/components/responses/CrawlLeaderboardResponse",
 					},
 					"201": &openapi3.ResponseRef{
-						Ref: "#/components/responses/CompetitionCrawlResponse",
+						Ref: "#/components/responses/CrawlLeaderboardResponse",
 					},
 				},
 			},

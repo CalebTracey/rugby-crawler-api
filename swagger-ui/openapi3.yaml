@@ -51,10 +51,8 @@ components:
         name:
           nullable: true
           type: string
-        teamIds:
-          items:
-            type: string
-          type: array
+        teams:
+          $ref: '#/components/schemas/TeamList'
       type: object
     ErrorLog:
       properties:
@@ -95,6 +93,61 @@ components:
           nullable: true
           type: string
       type: object
+    Team:
+      properties:
+        bonusPoints:
+          nullable: true
+          type: string
+        bonusPointsLosing:
+          nullable: true
+          type: string
+        bonusPointsTry:
+          nullable: true
+          type: string
+        bye:
+          nullable: true
+          type: string
+        drawCount:
+          nullable: true
+          type: string
+        gamesPlayed:
+          nullable: true
+          type: string
+        id:
+          nullable: true
+          type: string
+        lossCount:
+          nullable: true
+          type: string
+        name:
+          nullable: true
+          type: string
+        points:
+          nullable: true
+          type: string
+        pointsAgainst:
+          nullable: true
+          type: string
+        pointsDiff:
+          nullable: true
+          type: string
+        pointsFor:
+          nullable: true
+          type: string
+        triesAgainst:
+          nullable: true
+          type: string
+        triesFor:
+          nullable: true
+          type: string
+        winCount:
+          nullable: true
+          type: string
+      type: object
+    TeamList:
+      items:
+        $ref: '#/components/schemas/Team'
+      type: array
 info:
   contact:
     url: https://github.com/CalebTracey/rugby-crawler-api
