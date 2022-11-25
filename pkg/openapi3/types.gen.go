@@ -24,23 +24,49 @@ type Message struct {
 	TimeTaken *string    `json:"timeTaken"`
 }
 
-// CompetitionCrawlResponse defines model for CompetitionCrawlResponse.
-type CompetitionCrawlResponse struct {
-	CompId  *string  `json:"compId"`
-	Message *Message `json:"message,omitempty"`
-	Name    *string  `json:"name"`
+// TeamLeaderboardData defines model for TeamLeaderboardData.
+type TeamLeaderboardData struct {
+	BonusPoints       *string `json:"bonusPoints"`
+	BonusPointsLosing *string `json:"bonusPointsLosing"`
+	BonusPointsTry    *string `json:"bonusPointsTry"`
+	Bye               *string `json:"bye"`
+	DrawCount         *string `json:"drawCount"`
+	GamesPlayed       *string `json:"gamesPlayed"`
+	Id                *string `json:"id"`
+	LossCount         *string `json:"lossCount"`
+	Name              *string `json:"name"`
+	Points            *string `json:"points"`
+	PointsAgainst     *string `json:"pointsAgainst"`
+	PointsDiff        *string `json:"pointsDiff"`
+	PointsFor         *string `json:"pointsFor"`
+	TriesAgainst      *string `json:"triesAgainst"`
+	TriesFor          *string `json:"triesFor"`
+	WinCount          *string `json:"winCount"`
 }
 
-// CompetitionCrawlRequest defines model for CompetitionCrawlRequest.
-type CompetitionCrawlRequest struct {
-	CompetitionID *string `json:"competitionID,omitempty"`
-	Date          *string `json:"date,omitempty"`
+// TeamLeaderboardDataList defines model for TeamLeaderboardDataList.
+type TeamLeaderboardDataList = []TeamLeaderboardData
+
+// CrawlLeaderboardResponse defines model for CrawlLeaderboardResponse.
+type CrawlLeaderboardResponse struct {
+	CompId  *string                  `json:"compId"`
+	Message *Message                 `json:"message,omitempty"`
+	Name    *string                  `json:"name"`
+	Teams   *TeamLeaderboardDataList `json:"teams,omitempty"`
+}
+
+// CrawlLeaderboardRequest defines model for CrawlLeaderboardRequest.
+type CrawlLeaderboardRequest struct {
+	CompId   *string `json:"compId"`
+	CompName *string `json:"compName,omitempty"`
+	Date     *string `json:"date"`
 }
 
 // CrawlCompJSONBody defines parameters for CrawlComp.
 type CrawlCompJSONBody struct {
-	CompetitionID *string `json:"competitionID,omitempty"`
-	Date          *string `json:"date,omitempty"`
+	CompId   *string `json:"compId"`
+	CompName *string `json:"compName,omitempty"`
+	Date     *string `json:"date"`
 }
 
 // CrawlCompJSONRequestBody defines body for CrawlComp for application/json ContentType.

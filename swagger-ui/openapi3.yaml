@@ -1,26 +1,26 @@
 components:
   requestBodies:
-    CompetitionCrawlRequest:
+    CrawlLeaderboardRequest:
       content:
         application/json:
           schema:
             properties:
-              competitionID:
+              compId:
+                nullable: true
+                type: string
+              compName:
                 minLength: 1
                 type: string
               date:
-                minLength: 1
+                nullable: true
                 type: string
-      description: Request used for crawling competition data
+      description: Request used for scraping competition leaderboard data
       required: true
   responses:
-    CompetitionCrawlResponse:
+    CrawlLeaderboardResponse:
       content:
         application/json:
           schema:
-            items:
-              title: teamIds
-              type: string
             nullable: true
             properties:
               compId:
@@ -31,16 +31,23 @@ components:
               name:
                 nullable: true
                 type: string
-      description: Response with competition crawl results
+              teams:
+                $ref: '#/components/schemas/TeamLeaderboardDataList'
+      description: Response with competition leaderboard crawl results
   schemas:
-    CompetitionCrawlRequest:
+    CrawlLeaderboardRequest:
       properties:
-        competitionID:
+        compId:
+          nullable: true
+          type: string
+        compName:
+          nullable: true
           type: string
         date:
+          nullable: true
           type: string
       type: object
-    CompetitionCrawlResponse:
+    CrawlLeaderboardResponse:
       nullable: true
       properties:
         compId:
@@ -51,10 +58,8 @@ components:
         name:
           nullable: true
           type: string
-        teamIds:
-          items:
-            type: string
-          type: array
+        teams:
+          $ref: '#/components/schemas/TeamLeaderboardDataList'
       type: object
     ErrorLog:
       properties:
@@ -95,6 +100,61 @@ components:
           nullable: true
           type: string
       type: object
+    TeamLeaderboardData:
+      properties:
+        bonusPoints:
+          nullable: true
+          type: string
+        bonusPointsLosing:
+          nullable: true
+          type: string
+        bonusPointsTry:
+          nullable: true
+          type: string
+        bye:
+          nullable: true
+          type: string
+        drawCount:
+          nullable: true
+          type: string
+        gamesPlayed:
+          nullable: true
+          type: string
+        id:
+          nullable: true
+          type: string
+        lossCount:
+          nullable: true
+          type: string
+        name:
+          nullable: true
+          type: string
+        points:
+          nullable: true
+          type: string
+        pointsAgainst:
+          nullable: true
+          type: string
+        pointsDiff:
+          nullable: true
+          type: string
+        pointsFor:
+          nullable: true
+          type: string
+        triesAgainst:
+          nullable: true
+          type: string
+        triesFor:
+          nullable: true
+          type: string
+        winCount:
+          nullable: true
+          type: string
+      type: object
+    TeamLeaderboardDataList:
+      items:
+        $ref: '#/components/schemas/TeamLeaderboardData'
+      type: array
 info:
   contact:
     url: https://github.com/CalebTracey/rugby-crawler-api
@@ -111,14 +171,14 @@ paths:
     post:
       operationId: CrawlComp
       requestBody:
-        $ref: '#/components/requestBodies/CompetitionCrawlRequest'
+        $ref: '#/components/requestBodies/CrawlLeaderboardRequest'
       responses:
         "201":
-          $ref: '#/components/responses/CompetitionCrawlResponse'
+          $ref: '#/components/responses/CrawlLeaderboardResponse'
         "400":
-          $ref: '#/components/responses/CompetitionCrawlResponse'
+          $ref: '#/components/responses/CrawlLeaderboardResponse'
         "500":
-          $ref: '#/components/responses/CompetitionCrawlResponse'
+          $ref: '#/components/responses/CrawlLeaderboardResponse'
     summary: Crawl Requests
 servers:
 - description: Local development

@@ -42,8 +42,8 @@ func (h *Handler) InitializeRoutes() *mux.Router {
 func (h *Handler) CompetitionHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
-		var compResponse response.CompetitionCrawlResponse
-		var compRequest request2.CompetitionCrawlRequest
+		var compResponse response.CrawlLeaderboardResponse
+		var compRequest request2.CrawlLeaderboardRequest
 		defer func() {
 			status, _ := strconv.Atoi(compResponse.Message.Status)
 			hn, _ := os.Hostname()
