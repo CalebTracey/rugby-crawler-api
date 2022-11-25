@@ -1,26 +1,26 @@
 components:
   requestBodies:
-    CompetitionCrawlRequest:
+    CrawlLeaderboardRequest:
       content:
         application/json:
           schema:
             properties:
-              competitionID:
+              compId:
+                nullable: true
+                type: string
+              compName:
                 minLength: 1
                 type: string
               date:
-                minLength: 1
+                nullable: true
                 type: string
-      description: Request used for crawling competition data
+      description: Request used for scraping competition leaderboard data
       required: true
   responses:
-    CompetitionCrawlResponse:
+    CrawlLeaderboardResponse:
       content:
         application/json:
           schema:
-            items:
-              title: teamIds
-              type: string
             nullable: true
             properties:
               compId:
@@ -31,16 +31,23 @@ components:
               name:
                 nullable: true
                 type: string
-      description: Response with competition crawl results
+              teams:
+                $ref: '#/components/schemas/TeamLeaderboardDataList'
+      description: Response with competition leaderboard crawl results
   schemas:
-    CompetitionCrawlRequest:
+    CrawlLeaderboardRequest:
       properties:
-        competitionID:
+        compId:
+          nullable: true
+          type: string
+        compName:
+          nullable: true
           type: string
         date:
+          nullable: true
           type: string
       type: object
-    CompetitionCrawlResponse:
+    CrawlLeaderboardResponse:
       nullable: true
       properties:
         compId:
@@ -52,7 +59,7 @@ components:
           nullable: true
           type: string
         teams:
-          $ref: '#/components/schemas/TeamList'
+          $ref: '#/components/schemas/TeamLeaderboardDataList'
       type: object
     ErrorLog:
       properties:
@@ -93,7 +100,7 @@ components:
           nullable: true
           type: string
       type: object
-    Team:
+    TeamLeaderboardData:
       properties:
         bonusPoints:
           nullable: true
@@ -144,9 +151,9 @@ components:
           nullable: true
           type: string
       type: object
-    TeamList:
+    TeamLeaderboardDataList:
       items:
-        $ref: '#/components/schemas/Team'
+        $ref: '#/components/schemas/TeamLeaderboardData'
       type: array
 info:
   contact:
@@ -164,14 +171,14 @@ paths:
     post:
       operationId: CrawlComp
       requestBody:
-        $ref: '#/components/requestBodies/CompetitionCrawlRequest'
+        $ref: '#/components/requestBodies/CrawlLeaderboardRequest'
       responses:
         "201":
-          $ref: '#/components/responses/CompetitionCrawlResponse'
+          $ref: '#/components/responses/CrawlLeaderboardResponse'
         "400":
-          $ref: '#/components/responses/CompetitionCrawlResponse'
+          $ref: '#/components/responses/CrawlLeaderboardResponse'
         "500":
-          $ref: '#/components/responses/CompetitionCrawlResponse'
+          $ref: '#/components/responses/CrawlLeaderboardResponse'
     summary: Crawl Requests
 servers:
 - description: Local development

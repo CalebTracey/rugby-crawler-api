@@ -1,8 +1,8 @@
 package models
 
-type TeamList []Team
+type TeamLeaderboardDataList []TeamLeaderboardData
 
-type Team struct {
+type TeamLeaderboardData struct {
 	Id                string `json:"id,omitempty"`
 	Name              string `json:"name,omitempty"`
 	GamesPlayed       string `json:"gamesPlayed,omitempty"`

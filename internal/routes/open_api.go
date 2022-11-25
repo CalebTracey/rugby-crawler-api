@@ -39,7 +39,7 @@ func NewOpenAPI3() openapi3.T {
 	}
 
 	swagger.Components.Schemas = openapi3.Schemas{
-		"Team": openapi3.NewSchemaRef("",
+		"TeamLeaderboardData": openapi3.NewSchemaRef("",
 			openapi3.NewObjectSchema().
 				WithProperty("id", openapi3.NewStringSchema().
 					WithNullable()).
@@ -73,24 +73,28 @@ func NewOpenAPI3() openapi3.T {
 					WithNullable()).
 				WithProperty("points", openapi3.NewStringSchema().
 					WithNullable())),
-		"TeamList": openapi3.NewArraySchema().
+		"TeamLeaderboardDataList": openapi3.NewArraySchema().
 			WithItems(&openapi3.Schema{
 				Type: openapi3.TypeArray,
 				Items: &openapi3.SchemaRef{
-					Ref: "#/components/schemas/Team",
+					Ref: "#/components/schemas/TeamLeaderboardData",
 				}}).Items,
-		"CompetitionCrawlRequest": openapi3.NewSchemaRef("",
+		"CrawlLeaderboardRequest": openapi3.NewSchemaRef("",
 			openapi3.NewObjectSchema().
-				WithProperty("competitionID", openapi3.NewStringSchema()).
-				WithProperty("date", openapi3.NewStringSchema())),
-		"CompetitionCrawlResponse": openapi3.NewSchemaRef("",
+				WithProperty("compId", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("compName", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("date", openapi3.NewStringSchema().
+					WithNullable())),
+		"CrawlLeaderboardResponse": openapi3.NewSchemaRef("",
 			openapi3.NewObjectSchema().
 				WithProperty("compId", openapi3.NewStringSchema().
 					WithNullable()).
 				WithProperty("name", openapi3.NewStringSchema().
 					WithNullable()).
 				WithPropertyRef("teams", &openapi3.SchemaRef{
-					Ref: "#/components/schemas/TeamList",
+					Ref: "#/components/schemas/TeamLeaderboardDataList",
 				}).
 				WithPropertyRef("message", &openapi3.SchemaRef{
 					Ref: "#/components/schemas/Message",
@@ -136,9 +140,11 @@ func NewOpenAPI3() openapi3.T {
 				WithRequired(true).
 				WithJSONSchema(openapi3.NewSchema().
 					WithProperty("compId", openapi3.NewStringSchema().
+						WithNullable()).
+					WithProperty("compName", openapi3.NewStringSchema().
 						WithMinLength(1)).
 					WithProperty("date", openapi3.NewStringSchema().
-						WithMinLength(1))),
+						WithNullable())),
 		},
 	}
 
@@ -151,9 +157,8 @@ func NewOpenAPI3() openapi3.T {
 						WithNullable()).
 					WithProperty("name", openapi3.NewStringSchema().
 						WithNullable()).
-					WithItems(&openapi3.Schema{
-						Title: "teamIds",
-						Type:  openapi3.TypeString,
+					WithPropertyRef("teams", &openapi3.SchemaRef{
+						Ref: "#/components/schemas/TeamLeaderboardDataList",
 					}).
 					WithPropertyRef("message", &openapi3.SchemaRef{
 						Ref: "#/components/schemas/Message",

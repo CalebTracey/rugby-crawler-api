@@ -24,11 +24,10 @@ type Facade struct {
 }
 
 func (s Facade) CrawlLeaderboard(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse) {
-	//TODO create scrape url
-	url := s.CompMapper.BuildCrawlerUrl(req.CompId)
+	compId := getCompId(req.CompName)
+	url := s.CompMapper.BuildCrawlerUrl(compId)
 	resp, err := s.CompDAO.CrawlLeaderboardData(url)
 	if err != nil {
-
 		log.Error(err)
 		return response.CrawlLeaderboardResponse{
 			Message: response.Message{
@@ -38,18 +37,34 @@ func (s Facade) CrawlLeaderboard(ctx context.Context, req request.CrawlLeaderboa
 			},
 		}
 	}
-	//compExec := s.CompMapper.MapAddPSQLCompetitionData(resp.CompId, resp.Name, resp.TeamIds)
-	//_, dbErr := s.DBDAO.InsertOne(ctx, compExec)
-	//if dbErr != nil {
-	//	log.Error(dbErr)
-	//	return response.CrawlLeaderboardResponse{
-	//		Message: response.Message{
-	//			ErrorLog: response.ErrorLogs{
-	//				*dbErr,
-	//			},
-	//		},
-	//	}
-	//}
+	for _, team := range resp.Teams {
+		exec := s.CompMapper.CreateInsertLeaderboardExec(compId, req.CompName, team)
+		_, dbErr := s.DBDAO.InsertOne(ctx, exec)
+		if err != nil {
+			log.Error(dbErr)
+			return response.CrawlLeaderboardResponse{
+				Message: response.Message{
+					ErrorLog: response.ErrorLogs{
+						*dbErr,
+					},
+				},
+			}
+		}
+	}
 	//TODO add response mapping
 	return resp
 }
+
+func getCompId(compName string) string {
+	switch compName {
+	case SixNations:
+		return SixNationsId
+	default:
+		return ""
+	}
+}
+
+const (
+	SixNations   = "six nations"
+	SixNationsId = "180659"
+)

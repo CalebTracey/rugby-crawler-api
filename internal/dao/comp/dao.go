@@ -22,7 +22,7 @@ func (s DAO) CrawlLeaderboardData(url string) (resp response.CrawlLeaderboardRes
 		re := regexp.MustCompile("[0-9]+")
 		e.ForEach("tr", func(_ int, el *colly.HTMLElement) {
 			href := el.ChildAttr("a.react-router-link", "href")
-			team := models.Team{
+			team := models.TeamLeaderboardData{
 				Id:                re.FindAllString(href, -1)[0],
 				Name:              el.ChildText("span.team-names"),
 				GamesPlayed:       el.ChildText("td:nth-child(2)"),

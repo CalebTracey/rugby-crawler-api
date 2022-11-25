@@ -3,10 +3,10 @@ package response
 import "github.com/calebtracey/rugby-crawler-api/external/models"
 
 type CrawlLeaderboardResponse struct {
-	CompId  string          `json:"compId,omitempty"`
-	Name    string          `json:"name,omitempty"`
-	Teams   models.TeamList `json:"teams,omitempty"`
-	Message Message         `json:"message,omitempty"`
+	CompId  string                         `json:"compId,omitempty"`
+	Name    string                         `json:"name,omitempty"`
+	Teams   models.TeamLeaderboardDataList `json:"teams,omitempty"`
+	Message Message                        `json:"message,omitempty"`
 }
 
 type Message struct {
