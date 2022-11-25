@@ -8,14 +8,13 @@ import (
 )
 
 var (
-	configPath = "config.yaml"
+	configPath = "dev_config.yaml"
 )
 
 const Port = "6080"
 
 func main() {
 	defer panicQuit()
-	//log.Fatal(godotenv.Load())
 	appConfig := config.NewFromFile(configPath)
 	facade, err := initializeDAO(*appConfig)
 	if err != nil {

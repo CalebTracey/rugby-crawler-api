@@ -11,8 +11,8 @@ DatabaseConfigs:
     Database: "rugby_db"
     Server: "localhost:5432"
     Username: "postgres"
-    Password: "password"
     Scheme: "postgres"
+    PasswordEnvVariable: "DB_PASSWORD_LOCAL"
 CrawlerConfigs:
   - Name: "COLLY"
     AppsJSONPath: ""
