@@ -7,10 +7,9 @@ package dbmocks
 import (
 	context "context"
 	sql "database/sql"
-	reflect "reflect"
-
-	response "github.com/calebtracey/rugby-models/response"
+	response "github.com/calebtracey/rugby-models/pkg/dtos/response"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
 // MockDAOI is a mock of DAOI interface.
