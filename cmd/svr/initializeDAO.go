@@ -22,7 +22,7 @@ func initializeDAO(config config.Config) (facade.APIFacadeI, error) {
 	}
 
 	return facade.APIFacade{
-		CompService: comp.Facade{
+		LeaderboardService: comp.Facade{
 			DbDAO: psql.DAO{
 				Db: psqlDbConfig.DB,
 			},

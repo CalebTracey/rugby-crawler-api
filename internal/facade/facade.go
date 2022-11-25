@@ -11,16 +11,16 @@ import (
 
 //go:generate mockgen -destination=../mocks/mockFacade.go -package=mocks . APIFacadeI
 type APIFacadeI interface {
-	CompetitionCrawlData(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse)
+	CrawlLeaderboardData(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse)
 }
 
 type APIFacade struct {
-	CompService comp.FacadeI
+	LeaderboardService comp.FacadeI
 }
 
-func (s APIFacade) CompetitionCrawlData(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse) {
+func (s APIFacade) CrawlLeaderboardData(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse) {
 	//TODO add request validation
-	resp = s.CompService.CrawlLeaderboard(ctx, req)
+	resp = s.LeaderboardService.CrawlLeaderboard(ctx, req)
 
 	return resp
 }

@@ -36,16 +36,16 @@ func (m *MockAPIFacadeI) EXPECT() *MockAPIFacadeIMockRecorder {
 	return m.recorder
 }
 
-// CompetitionCrawlData mocks base method.
-func (m *MockAPIFacadeI) CompetitionCrawlData(arg0 context.Context, arg1 request.CrawlLeaderboardRequest) response.CrawlLeaderboardResponse {
+// CrawlLeaderboardData mocks base method.
+func (m *MockAPIFacadeI) CrawlLeaderboardData(arg0 context.Context, arg1 request.CrawlLeaderboardRequest) response.CrawlLeaderboardResponse {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CompetitionCrawlData", arg0, arg1)
+	ret := m.ctrl.Call(m, "CrawlLeaderboardData", arg0, arg1)
 	ret0, _ := ret[0].(response.CrawlLeaderboardResponse)
 	return ret0
 }
 
-// CompetitionCrawlData indicates an expected call of CompetitionCrawlData.
-func (mr *MockAPIFacadeIMockRecorder) CompetitionCrawlData(arg0, arg1 interface{}) *gomock.Call {
+// CrawlLeaderboardData indicates an expected call of CrawlLeaderboardData.
+func (mr *MockAPIFacadeIMockRecorder) CrawlLeaderboardData(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CompetitionCrawlData", reflect.TypeOf((*MockAPIFacadeI)(nil).CompetitionCrawlData), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CrawlLeaderboardData", reflect.TypeOf((*MockAPIFacadeI)(nil).CrawlLeaderboardData), arg0, arg1)
 }
