@@ -14,16 +14,20 @@ func main() {
 	}
 
 	compId := "123"
+	compName := "test comp"
 	date := "2022/12/12"
 	respC, err := client.CrawlCompWithResponse(context.Background(),
 		openapi3.CrawlCompJSONRequestBody{
-			CompetitionID: &compId,
-			Date:          &date,
+			CompId:   &compId,
+			CompName: &compName,
+			Date:     &date,
 		})
 	if err != nil {
 		log.Fatalf("Couldn't get competition %s", err)
 	}
 
+	fmt.Printf("\tCompetition Id: %s\n", *respC.JSON201.CompId)
 	fmt.Printf("\tCompetition Name: %s\n", *respC.JSON201.Name)
+	fmt.Printf("\tCompetition Teams: %s\n", *respC.JSON201.Teams)
 	fmt.Printf("\tMessage: %v\n", *respC.JSON201.Message)
 }
