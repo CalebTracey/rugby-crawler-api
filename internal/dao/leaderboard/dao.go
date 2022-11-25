@@ -1,4 +1,4 @@
-package comp
+package leaderboard
 
 import (
 	"github.com/calebtracey/rugby-crawler-api/external/models"
@@ -8,7 +8,7 @@ import (
 	"regexp"
 )
 
-//go:generate mockgen -destination=mockDao.go -package=comp . DAOI
+//go:generate mockgen -destination=../../mocks/compmocks/mockDao.go -package=compmocks . DAOI
 type DAOI interface {
 	CrawlLeaderboardData(url string) (resp response.CrawlLeaderboardResponse, log *response.ErrorLog)
 }

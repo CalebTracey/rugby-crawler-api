@@ -6,13 +6,19 @@ import (
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/calebtracey/rugby-crawler-api/external/models/response"
+	log "github.com/sirupsen/logrus"
 	"reflect"
 	"testing"
 )
 
 func TestDAO_InsertOne(t *testing.T) {
 	db, mock, _ := sqlmock.New()
-
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Error(err)
+		}
+	}(db)
 	tests := []struct {
 		name      string
 		DB        *sql.DB
@@ -47,7 +53,7 @@ func TestDAO_InsertOne(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := DAO{
-				DB: tt.DB,
+				Db: tt.DB,
 			}
 			if !tt.expectErr {
 				mock.ExpectExec(tt.exec).WillReturnResult(tt.wantResp)

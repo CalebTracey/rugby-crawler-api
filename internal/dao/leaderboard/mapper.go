@@ -1,4 +1,4 @@
-package comp
+package leaderboard
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+//go:generate mockgen -destination=../../mocks/compmocks/mockMapper.go -package=compmocks . MapperI
 type MapperI interface {
 	BuildCrawlerUrl(teamId string) string
 	MapAddPSQLCompetitionData(compId, name string, teamIds []string) string
@@ -56,6 +57,11 @@ func (m Mapper) CreateInsertLeaderboardExec(compIdStr, compName string, td model
 }
 
 const (
+	CrawlBaseUrl   = "https://www.espn.co.uk/rugby/"
+	CrawlCompField = "table/_/league/"
+)
+
+const (
 	PSQLAddCompetitionData = `update public.competitions (comp_id, name, teams)
 			values ('%s', '%s', '{%s}') returning name;`
 
@@ -86,6 +92,4 @@ const (
 			(comp_id, comp_name, team_id, team_name, games_played, win_count, draw_count, loss_count, bye, points_for, points_against, tries_for, tries_against, bonus_points_try, bonus_points_losing, bonus_points, points_diff, points)
 			values ('%v', '%s', '%v', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
 			returning comp_name;`
-	CrawlBaseUrl   = "https://www.espn.co.uk/rugby/"
-	CrawlCompField = "table/_/league/"
 )
