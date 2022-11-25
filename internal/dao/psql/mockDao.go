@@ -36,21 +36,6 @@ func (m *MockDAOI) EXPECT() *MockDAOIMockRecorder {
 	return m.recorder
 }
 
-// FindAll mocks base method.
-func (m *MockDAOI) FindAll(arg0 context.Context, arg1 string) (*sql.Rows, *response.ErrorLog) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindAll", arg0, arg1)
-	ret0, _ := ret[0].(*sql.Rows)
-	ret1, _ := ret[1].(*response.ErrorLog)
-	return ret0, ret1
-}
-
-// FindAll indicates an expected call of FindAll.
-func (mr *MockDAOIMockRecorder) FindAll(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockDAOI)(nil).FindAll), arg0, arg1)
-}
-
 // InsertOne mocks base method.
 func (m *MockDAOI) InsertOne(arg0 context.Context, arg1 string) (sql.Result, *response.ErrorLog) {
 	m.ctrl.T.Helper()

@@ -10,7 +10,6 @@ import (
 //go:generate mockgen -destination=mockDao.go -package=psql . DAOI
 type DAOI interface {
 	InsertOne(ctx context.Context, exec string) (res sql.Result, error *response.ErrorLog)
-	FindAll(ctx context.Context, query string) (rows *sql.Rows, err *response.ErrorLog)
 }
 
 type DAO struct {
@@ -25,16 +24,6 @@ func (s DAO) InsertOne(ctx context.Context, exec string) (resp sql.Result, err *
 		return resp, err
 	}
 	return resp, nil
-}
-
-func (s DAO) FindAll(ctx context.Context, query string) (rows *sql.Rows, err *response.ErrorLog) {
-	rows, sqlErr := s.DB.QueryContext(ctx, query)
-	if sqlErr != nil {
-		log.Error(sqlErr)
-		err = mapError(sqlErr, query)
-		return rows, err
-	}
-	return rows, nil
 }
 
 func mapError(err error, query string) (errLog *response.ErrorLog) {

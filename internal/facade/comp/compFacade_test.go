@@ -16,6 +16,9 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 	_, mock, _ := sqlmock.New()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+	mockDbDao := psql.NewMockDAOI(ctrl)
+	mockCompDao := comp.NewMockDAOI(ctrl)
+
 	type fields struct {
 		DBDAO      psql.DAOI
 		CompDAO    comp.DAOI
