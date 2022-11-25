@@ -38,7 +38,7 @@ func TestAPIFacade_CrawlLeaderboardData(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := APIFacade{
-				LeaderboardService: tt.CompService,
+				CompService: tt.CompService,
 			}
 			mockLeaderboardService.EXPECT().CrawlLeaderboard(tt.args.ctx, tt.args.req).Return(tt.wantResp)
 			if gotResp := s.CrawlLeaderboardData(tt.args.ctx, tt.args.req); !reflect.DeepEqual(gotResp, tt.wantResp) {
