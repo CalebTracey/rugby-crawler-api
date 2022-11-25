@@ -5,6 +5,7 @@
 ---
 
 [rugby-models](https://github.com/CalebTracey/rugby-models) used for common data types
+
 [config-yaml](https://github.com/CalebTracey/config-yaml) used for environment configs and service/db initialization
 
 **Includes the following:**
