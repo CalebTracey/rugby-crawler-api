@@ -2,7 +2,7 @@ package comp
 
 import (
 	"fmt"
-	"github.com/calebtracey/rugby-crawler-api/external/models"
+	"github.com/calebtracey/rugby-models/models"
 	log "github.com/sirupsen/logrus"
 	"strconv"
 	"strings"

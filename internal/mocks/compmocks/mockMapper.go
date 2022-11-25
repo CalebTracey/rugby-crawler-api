@@ -7,7 +7,7 @@ package compmocks
 import (
 	reflect "reflect"
 
-	models "github.com/calebtracey/rugby-crawler-api/external/models"
+	models "github.com/calebtracey/rugby-models/models"
 	gomock "github.com/golang/mock/gomock"
 )
 
