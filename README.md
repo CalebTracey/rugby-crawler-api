@@ -1,15 +1,14 @@
-# api-template
+# rugby-crawler-api
 
-### Go REST API template
-
-This template uses a DAO/Facade pattern. The internal package contains basic example setups for each layer.
-
+### Go REST API for scraping rugby stats
+### [Swagger Docs](https://calebtracey.github.io/rugby-crawler-api/)
 ---
 
 **Includes the following:**
 - OpenAPI 3.0 documentation
 - GitHub Workflows for Test/Build phases
-- Preset Docker + docker-compose files
+- Simple yaml configuration options
+- Docker deployment
 
 **Basic setup**
 1. Create a local Postgres database and update the config.yaml file with the details
