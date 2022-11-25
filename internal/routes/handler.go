@@ -25,7 +25,7 @@ func (h *Handler) InitializeRoutes() *mux.Router {
 	// Health check
 	r.Handle("/health", h.HealthCheck()).Methods(http.MethodGet)
 
-	r.Handle("/competition", h.CompetitionHandler()).Methods(http.MethodPost)
+	r.Handle("/leaderboard", h.LeaderboardHandler()).Methods(http.MethodPost)
 
 	staticFs, err := fs.New()
 	if err != nil {
@@ -39,7 +39,7 @@ func (h *Handler) InitializeRoutes() *mux.Router {
 	return r
 }
 
-func (h *Handler) CompetitionHandler() http.HandlerFunc {
+func (h *Handler) LeaderboardHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
 		var compResponse response.LeaderboardResponse

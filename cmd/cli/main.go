@@ -16,8 +16,8 @@ func main() {
 	compId := "123"
 	compName := "test comp"
 	date := "2022/12/12"
-	respC, err := client.CrawlCompWithResponse(context.Background(),
-		openapi3.CrawlCompJSONRequestBody{
+	respC, err := client.GetLeaderboardDataWithResponse(context.Background(),
+		openapi3.GetLeaderboardDataJSONRequestBody{
 			CompId:   &compId,
 			CompName: &compName,
 			Date:     &date,
@@ -26,7 +26,7 @@ func main() {
 		log.Fatalf("Couldn't get competition %s", err)
 	}
 
-	fmt.Printf("\tCompetition Id: %s\n", *respC.JSON201.CompId)
+	fmt.Printf("\tCompetition Id: %s\n", *respC.JSON201.Id)
 	fmt.Printf("\tCompetition Name: %s\n", *respC.JSON201.Name)
 	fmt.Printf("\tCompetition Teams: %v\n", *respC.JSON201.Teams)
 	fmt.Printf("\tMessage: %v\n", *respC.JSON201.Message)
