@@ -28,6 +28,6 @@ func main() {
 
 	fmt.Printf("\tCompetition Id: %s\n", *respC.JSON201.CompId)
 	fmt.Printf("\tCompetition Name: %s\n", *respC.JSON201.Name)
-	fmt.Printf("\tCompetition Teams: %s\n", *respC.JSON201.Teams)
+	fmt.Printf("\tCompetition Teams: %v\n", *respC.JSON201.Teams)
 	fmt.Printf("\tMessage: %v\n", *respC.JSON201.Message)
 }
