@@ -9,7 +9,7 @@ import (
 
 //TODO create a response object to contain leaderboard data + all other data
 
-//go:generate mockgen -destination=mockFacade.go -package=facade . APIFacadeI
+//go:generate mockgen -destination=../mocks/mockFacade.go -package=mocks . APIFacadeI
 type APIFacadeI interface {
 	CompetitionCrawlData(ctx context.Context, req request.CrawlLeaderboardRequest) (resp response.CrawlLeaderboardResponse)
 }

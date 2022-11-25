@@ -1,4 +1,4 @@
-package comp
+package leaderboard
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-//go:generate mockgen -destination=mockMapper.go -package=comp . MapperI
+//go:generate mockgen -destination=../../mocks/compmocks/mockMapper.go -package=compmocks . MapperI
 type MapperI interface {
 	BuildCrawlerUrl(teamId string) string
 	MapAddPSQLCompetitionData(compId, name string, teamIds []string) string

@@ -7,17 +7,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//go:generate mockgen -destination=mockDao.go -package=psql . DAOI
+//go:generate mockgen -destination=../../mocks/dbmocks/mockDao.go -package=dbmocks . DAOI
 type DAOI interface {
 	InsertOne(ctx context.Context, exec string) (res sql.Result, error *response.ErrorLog)
 }
 
 type DAO struct {
-	DB *sql.DB
+	Db *sql.DB
 }
 
 func (s DAO) InsertOne(ctx context.Context, exec string) (resp sql.Result, err *response.ErrorLog) {
-	resp, sqlErr := s.DB.ExecContext(ctx, exec)
+	resp, sqlErr := s.Db.ExecContext(ctx, exec)
 	if sqlErr != nil {
 		log.Error(sqlErr)
 		err = mapError(sqlErr, exec)
