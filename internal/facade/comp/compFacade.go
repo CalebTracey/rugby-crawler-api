@@ -38,6 +38,7 @@ func (s Facade) CrawlLeaderboard(ctx context.Context, req request.CrawlLeaderboa
 		}
 	}
 	for _, team := range resp.Teams {
+		//TODO figure out if this should be 'update' instead of 'insert'
 		exec := s.CompMapper.CreateInsertLeaderboardExec(compId, req.CompName, team)
 		_, dbErr := s.DBDAO.InsertOne(ctx, exec)
 		if err != nil {
