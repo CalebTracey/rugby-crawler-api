@@ -1,30 +1,19 @@
-package comp
+package psql
 
 import (
 	"fmt"
 	"github.com/calebtracey/rugby-models/pkg/dtos"
 	log "github.com/sirupsen/logrus"
 	"strconv"
-	"strings"
 )
 
-//go:generate mockgen -destination=../../mocks/compmocks/mockMapper.go -package=compmocks . MapperI
+//go:generate mockgen -destination=../../mocks/dbmocks/mockMapper.go -package=dbmocks . MapperI
 type MapperI interface {
-	BuildCrawlerUrl(teamId string) string
-	MapAddPSQLCompetitionData(compId, name string, teamIds []string) string
 	CreateUpdateLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string
 	CreateInsertLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string
 }
 
 type Mapper struct{}
-
-func (m Mapper) BuildCrawlerUrl(teamId string) string {
-	return strings.Join([]string{CrawlBaseUrl, CrawlCompField, teamId}, "")
-}
-
-func (m Mapper) MapAddPSQLCompetitionData(compId, name string, teamIds []string) string {
-	return fmt.Sprintf(PSQLAddCompetitionData, compId, name, teamIds)
-}
 
 func (m Mapper) CreateUpdateLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string {
 	compId, err := strconv.Atoi(compIdStr)
@@ -35,7 +24,7 @@ func (m Mapper) CreateUpdateLeaderboardExec(compIdStr, compName string, td dtos.
 	if err != nil {
 		log.Error(err)
 	}
-	return fmt.Sprintf(PSQLUpdateLeaderboardExec,
+	return fmt.Sprintf(UpdateLeaderboardExec,
 		compId, compName, teamId, td.Name, td.GamesPlayed, td.WinCount, td.DrawCount, td.LossCount,
 		td.Bye, td.PointsFor, td.PointsAgainst, td.TriesFor, td.TriesAgainst, td.BonusPointsTry,
 		td.BonusPointsLosing, td.BonusPoints, td.PointsDiff, td.Points, compId)
@@ -50,22 +39,14 @@ func (m Mapper) CreateInsertLeaderboardExec(compIdStr, compName string, td dtos.
 	if err != nil {
 		log.Error(err)
 	}
-	return fmt.Sprintf(PSQLInsertLeaderboardExec,
+	return fmt.Sprintf(InsertLeaderboardExec,
 		compId, compName, teamId, td.Name, td.GamesPlayed, td.WinCount, td.DrawCount, td.LossCount,
 		td.Bye, td.PointsFor, td.PointsAgainst, td.TriesFor, td.TriesAgainst, td.BonusPointsTry,
 		td.BonusPointsLosing, td.BonusPoints, td.PointsDiff, td.Points)
 }
 
 const (
-	CrawlBaseUrl   = "https://www.espn.co.uk/rugby/"
-	CrawlCompField = "table/_/league/"
-)
-
-const (
-	PSQLAddCompetitionData = `update public.competitions (comp_id, name, teams)
-			values ('%s', '%s', '{%s}') returning name;`
-
-	PSQLUpdateLeaderboardExec = `
+	UpdateLeaderboardExec = `
 		update comp_leaderboard
 			set comp_id = '%v',
 				comp_name = '%s',
@@ -87,9 +68,26 @@ const (
 				points = '%s'
 			where comp_id = '%v';`
 
-	PSQLInsertLeaderboardExec = `
+	InsertLeaderboardExec = `
 		insert into comp_leaderboard
-			(comp_id, comp_name, team_id, team_name, games_played, win_count, draw_count, loss_count, bye, points_for, points_against, tries_for, tries_against, bonus_points_try, bonus_points_losing, bonus_points, points_diff, points)
+			(comp_id, 
+			 comp_name, 
+			 team_id, 
+			 team_name, 
+			 games_played, 
+			 win_count, 
+			 draw_count, 
+			 loss_count, 
+			 bye, 
+			 points_for, 
+			 points_against, 
+			 tries_for, 
+			 tries_against, 
+			 bonus_points_try, 
+			 bonus_points_losing, 
+			 bonus_points, 
+			 points_diff, 
+			 points)
 			values ('%v', '%s', '%v', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
 			returning comp_name;`
 )

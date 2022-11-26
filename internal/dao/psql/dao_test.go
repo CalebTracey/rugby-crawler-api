@@ -49,6 +49,18 @@ func TestDAO_InsertOne(t *testing.T) {
 			mockErr:   errors.New("error"),
 			expectErr: true,
 		},
+		{
+			name: "Sad Path - no rows",
+			DB:   db,
+			ctx:  context.Background(),
+			exec: ``,
+			wantErr: &response.ErrorLog{
+				StatusCode: "404",
+				RootCause:  "Not found in database",
+			},
+			mockErr:   sql.ErrNoRows,
+			expectErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -16,14 +16,14 @@ type FacadeI interface {
 }
 
 type Facade struct {
-	DbDAO      psql.DAOI
-	CompDAO    comp.DAOI
-	CompMapper comp.MapperI
+	DbDAO    psql.DAOI
+	CompDAO  comp.DAOI
+	DbMapper psql.MapperI
 }
 
 func (s Facade) CrawlLeaderboard(ctx context.Context, req request.LeaderboardRequest) (resp response.LeaderboardResponse) {
 	compId := getCompId(req.CompName)
-	url := s.CompMapper.BuildCrawlerUrl(compId)
+	url := buildCrawlerUrl(compId)
 	resp, err := s.CompDAO.CrawlLeaderboardData(url)
 	if err != nil {
 		log.Error(err)
@@ -37,7 +37,7 @@ func (s Facade) CrawlLeaderboard(ctx context.Context, req request.LeaderboardReq
 	}
 	for _, team := range resp.Teams {
 		//TODO figure out if this should be 'update' instead of 'insert'
-		exec := s.CompMapper.CreateInsertLeaderboardExec(compId, req.CompName, team)
+		exec := s.DbMapper.CreateInsertLeaderboardExec(compId, req.CompName, team)
 		_, dbErr := s.DbDAO.InsertOne(ctx, exec)
 		if dbErr != nil {
 			log.Error(dbErr)
@@ -54,6 +54,10 @@ func (s Facade) CrawlLeaderboard(ctx context.Context, req request.LeaderboardReq
 	return resp
 }
 
+func buildCrawlerUrl(compId string) string {
+	return strings.Join([]string{CrawlBaseUrl, CrawlCompField, compId}, "")
+}
+
 func getCompId(compName string) string {
 	switch strings.ToLower(compName) {
 	case SixNations:
@@ -64,6 +68,9 @@ func getCompId(compName string) string {
 }
 
 const (
+	CrawlBaseUrl   = "https://www.espn.co.uk/rugby/"
+	CrawlCompField = "table/_/league/"
+
 	SixNations   = "six nations"
 	SixNationsId = "180659"
 )

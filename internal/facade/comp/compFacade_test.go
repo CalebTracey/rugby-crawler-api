@@ -23,11 +23,11 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 	defer ctrl.Finish()
 	mockDbDao := dbmocks.NewMockDAOI(ctrl)
 	mockLeaderboardDAO := compmocks.NewMockDAOI(ctrl)
-	mockLeaderboardMapper := compmocks.NewMockMapperI(ctrl)
+	mockDbMapper := dbmocks.NewMockMapperI(ctrl)
 	type fields struct {
-		DbDAO      psql.DAOI
-		CompDAO    comp.DAOI
-		CompMapper comp.MapperI
+		DbDAO    psql.DAOI
+		CompDAO  comp.DAOI
+		DbMapper psql.MapperI
 	}
 	type args struct {
 		ctx context.Context
@@ -50,9 +50,9 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 		{
 			name: "Happy Path",
 			fields: fields{
-				DbDAO:      mockDbDao,
-				CompDAO:    mockLeaderboardDAO,
-				CompMapper: mockLeaderboardMapper,
+				DbDAO:    mockDbDao,
+				CompDAO:  mockLeaderboardDAO,
+				DbMapper: mockDbMapper,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -61,7 +61,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 				},
 			},
 			exec: ``,
-			url:  "https://test.url",
+			url:  "https://www.espn.co.uk/rugby/table/_/league/180659",
 			wantCrawlResp: response.LeaderboardResponse{
 				Id:   "180659",
 				Name: "Six Nations",
@@ -87,9 +87,9 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 		{
 			name: "Sad Path - crawl error",
 			fields: fields{
-				DbDAO:      mockDbDao,
-				CompDAO:    mockLeaderboardDAO,
-				CompMapper: mockLeaderboardMapper,
+				DbDAO:    mockDbDao,
+				CompDAO:  mockLeaderboardDAO,
+				DbMapper: mockDbMapper,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -98,7 +98,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 				},
 			},
 			exec: ``,
-			url:  "https://test.url",
+			url:  "https://www.espn.co.uk/rugby/table/_/league/180659",
 			wantCrawlResp: response.LeaderboardResponse{
 				Message: response.Message{
 					ErrorLog: response.ErrorLogs{
@@ -138,9 +138,9 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 		{
 			name: "Sad Path - database error",
 			fields: fields{
-				DbDAO:      mockDbDao,
-				CompDAO:    mockLeaderboardDAO,
-				CompMapper: mockLeaderboardMapper,
+				DbDAO:    mockDbDao,
+				CompDAO:  mockLeaderboardDAO,
+				DbMapper: mockDbMapper,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -149,7 +149,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 				},
 			},
 			exec: ``,
-			url:  "https://test.url",
+			url:  "https://www.espn.co.uk/rugby/table/_/league/180659",
 			wantCrawlResp: response.LeaderboardResponse{
 				Id:   "180659",
 				Name: "Six Nations",
@@ -187,12 +187,11 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := Facade{
-				DbDAO:      tt.fields.DbDAO,
-				CompDAO:    tt.fields.CompDAO,
-				CompMapper: tt.fields.CompMapper,
+				DbDAO:    tt.fields.DbDAO,
+				CompDAO:  tt.fields.CompDAO,
+				DbMapper: tt.fields.DbMapper,
 			}
 			mock.ExpectBegin()
-			mockLeaderboardMapper.EXPECT().BuildCrawlerUrl(gomock.Any()).Return(tt.url)
 			mockLeaderboardDAO.EXPECT().CrawlLeaderboardData(tt.url).
 				DoAndReturn(func(url string) (response.LeaderboardResponse, *response.ErrorLog) {
 					if tt.expectCrawlError {
@@ -201,7 +200,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 					return tt.wantCrawlResp, nil
 				})
 			if !tt.expectCrawlError {
-				mockLeaderboardMapper.EXPECT().CreateInsertLeaderboardExec(gomock.Any(), gomock.Any(), gomock.Any()).Return(tt.exec)
+				mockDbMapper.EXPECT().CreateInsertLeaderboardExec(gomock.Any(), gomock.Any(), gomock.Any()).Return(tt.exec)
 				mockDbDao.EXPECT().InsertOne(tt.args.ctx, tt.exec).
 					DoAndReturn(func(ctx context.Context, exec string) (sql.Result, *response.ErrorLog) {
 						if tt.expectDbError {
