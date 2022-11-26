@@ -37,6 +37,7 @@ func NewOpenAPI3() openapi3.T {
 	}
 
 	swagger.Components.Schemas = openapi3.Schemas{
+		// Models for database interaction
 		"PSQLLeaderboardData": openapi3.NewSchemaRef("",
 			openapi3.NewObjectSchema().
 				WithProperty("comp_id", openapi3.NewStringSchema().
@@ -46,6 +47,8 @@ func NewOpenAPI3() openapi3.T {
 				WithProperty("team_id", openapi3.NewStringSchema().
 					WithNullable()).
 				WithProperty("team_name", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("team_abbr", openapi3.NewStringSchema().
 					WithNullable()).
 				WithProperty("games_played", openapi3.NewStringSchema().
 					WithNullable()).
@@ -81,12 +84,9 @@ func NewOpenAPI3() openapi3.T {
 				Items: &openapi3.SchemaRef{
 					Ref: "#/components/schemas/PSQLLeaderboardData",
 				}}).Items,
-		"TeamLeaderboardData": openapi3.NewSchemaRef("",
+		// Data transfer objects
+		"TeamCompetitionStats": openapi3.NewSchemaRef("",
 			openapi3.NewObjectSchema().
-				WithProperty("id", openapi3.NewStringSchema().
-					WithNullable()).
-				WithProperty("name", openapi3.NewStringSchema().
-					WithNullable()).
 				WithProperty("gamesPlayed", openapi3.NewStringSchema().
 					WithNullable()).
 				WithProperty("winCount", openapi3.NewStringSchema().
@@ -115,11 +115,37 @@ func NewOpenAPI3() openapi3.T {
 					WithNullable()).
 				WithProperty("points", openapi3.NewStringSchema().
 					WithNullable())),
+		"TeamLeaderboardData": openapi3.NewSchemaRef("",
+			openapi3.NewObjectSchema().
+				WithProperty("id", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("name", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("abbr", openapi3.NewStringSchema().
+					WithNullable()).
+				WithPropertyRef("competitionStats", &openapi3.SchemaRef{
+					Ref: "#/components/schemas/TeamCompetitionStats",
+				})),
 		"TeamLeaderboardDataList": openapi3.NewArraySchema().
 			WithItems(&openapi3.Schema{
 				Type: openapi3.TypeArray,
 				Items: &openapi3.SchemaRef{
 					Ref: "#/components/schemas/TeamLeaderboardData",
+				}}).Items,
+		"CompetitionLeaderboardData": openapi3.NewSchemaRef("",
+			openapi3.NewObjectSchema().
+				WithProperty("compId", openapi3.NewStringSchema().
+					WithNullable()).
+				WithProperty("compName", openapi3.NewStringSchema().
+					WithNullable()).
+				WithPropertyRef("teams", &openapi3.SchemaRef{
+					Ref: "#/components/schemas/TeamLeaderboardDataList",
+				})),
+		"CompetitionLeaderboardDataList": openapi3.NewArraySchema().
+			WithItems(&openapi3.Schema{
+				Type: openapi3.TypeArray,
+				Items: &openapi3.SchemaRef{
+					Ref: "#/components/schemas/CompetitionLeaderboardData",
 				}}).Items,
 		"ErrorLog": openapi3.NewSchemaRef("",
 			openapi3.NewObjectSchema().
@@ -178,14 +204,21 @@ func NewOpenAPI3() openapi3.T {
 			Value: openapi3.NewResponse().
 				WithDescription("Response with competition data").
 				WithContent(openapi3.NewContentWithJSONSchema(openapi3.NewSchema().
-					WithProperty("id", openapi3.NewStringSchema().
-						WithNullable()).
-					WithProperty("name", openapi3.NewStringSchema()).
-					WithNullable().
-					WithPropertyRef("teams", &openapi3.SchemaRef{
-						Ref: "#/components/schemas/TeamLeaderboardDataList",
+					WithPropertyRef("leaderboardData", &openapi3.SchemaRef{
+						Ref: "#/components/schemas/CompetitionLeaderboardData",
 					}).
-					WithNullable().
+					WithPropertyRef("message", &openapi3.SchemaRef{
+						Ref: "#/components/schemas/Message",
+					}).
+					WithNullable())),
+		},
+		"AllLeaderboardsResponse": &openapi3.ResponseRef{
+			Value: openapi3.NewResponse().
+				WithDescription("Response with competition data").
+				WithContent(openapi3.NewContentWithJSONSchema(openapi3.NewSchema().
+					WithPropertyRef("leaderboardDataList", &openapi3.SchemaRef{
+						Ref: "#/components/schemas/CompetitionLeaderboardDataList",
+					}).
 					WithPropertyRef("message", &openapi3.SchemaRef{
 						Ref: "#/components/schemas/Message",
 					}).
@@ -210,6 +243,23 @@ func NewOpenAPI3() openapi3.T {
 					},
 					"201": &openapi3.ResponseRef{
 						Ref: "#/components/responses/LeaderboardResponse",
+					},
+				},
+			},
+		},
+		"/leaderboards": &openapi3.PathItem{
+			Description: "All Leaderboard Data",
+			Get: &openapi3.Operation{
+				OperationID: "GetAllLeaderboardData",
+				Responses: openapi3.Responses{
+					"400": &openapi3.ResponseRef{
+						Ref: "#/components/responses/AllLeaderboardsResponse",
+					},
+					"500": &openapi3.ResponseRef{
+						Ref: "#/components/responses/AllLeaderboardsResponse",
+					},
+					"201": &openapi3.ResponseRef{
+						Ref: "#/components/responses/AllLeaderboardsResponse",
 					},
 				},
 			},

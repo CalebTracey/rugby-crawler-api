@@ -57,24 +57,28 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				req: request.LeaderboardRequest{
-					CompName: "Six Nations",
+					CompName: "six nations",
 				},
 			},
 			exec: ``,
 			url:  "https://www.espn.co.uk/rugby/table/_/league/180659",
 			wantCrawlResp: response.LeaderboardResponse{
-				Id:   "180659",
-				Name: "Six Nations",
-				Teams: dtos.TeamLeaderboardDataList{
-					{},
+				LeaderboardData: dtos.CompetitionLeaderboardData{
+					CompId:   "180659",
+					CompName: "Six Nations",
+					Teams: dtos.TeamLeaderboardDataList{
+						{},
+					},
 				},
 				Message: response.Message{},
 			},
 			wantResp: response.LeaderboardResponse{
-				Id:   "180659",
-				Name: "Six Nations",
-				Teams: dtos.TeamLeaderboardDataList{
-					{},
+				LeaderboardData: dtos.CompetitionLeaderboardData{
+					CompId:   "180659",
+					CompName: "Six Nations",
+					Teams: dtos.TeamLeaderboardDataList{
+						{},
+					},
 				},
 				Message: response.Message{},
 			},
@@ -151,10 +155,12 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			exec: ``,
 			url:  "https://www.espn.co.uk/rugby/table/_/league/180659",
 			wantCrawlResp: response.LeaderboardResponse{
-				Id:   "180659",
-				Name: "Six Nations",
-				Teams: dtos.TeamLeaderboardDataList{
-					{},
+				LeaderboardData: dtos.CompetitionLeaderboardData{
+					CompId:   "180659",
+					CompName: "Nations",
+					Teams: dtos.TeamLeaderboardDataList{
+						{},
+					},
 				},
 				Message: response.Message{},
 			},

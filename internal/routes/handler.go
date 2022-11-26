@@ -10,8 +10,6 @@ import (
 	"github.com/rakyll/statik/fs"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 )
 
@@ -26,6 +24,7 @@ func (h *Handler) InitializeRoutes() *mux.Router {
 	r.Handle("/health", h.HealthCheck()).Methods(http.MethodGet)
 
 	r.Handle("/leaderboard", h.LeaderboardHandler()).Methods(http.MethodPost)
+	r.Handle("/leaderboards", h.AllLeaderboardsHandler()).Methods(http.MethodGet)
 
 	staticFs, err := fs.New()
 	if err != nil {
@@ -42,28 +41,40 @@ func (h *Handler) InitializeRoutes() *mux.Router {
 func (h *Handler) LeaderboardHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
-		var compResponse response.LeaderboardResponse
-		var compRequest request.LeaderboardRequest
+		var status int
+		var leaderboardResponse response.LeaderboardResponse
+		var leaderboardRequest request.LeaderboardRequest
 		defer func() {
-			status, _ := strconv.Atoi(compResponse.Message.Status)
-			hn, _ := os.Hostname()
-			compResponse.Message.HostName = hn
-			compResponse.Message.TimeTaken = time.Since(startTime).String()
-			_ = json.NewEncoder(writeHeader(w, status)).Encode(compResponse)
+			status, leaderboardResponse.Message = setMessage(startTime, leaderboardResponse.Message)
+			_ = json.NewEncoder(writeHeader(w, status)).Encode(leaderboardResponse)
 		}()
+
 		body, bodyErr := readBody(r.Body)
-
 		if bodyErr != nil {
-			compResponse.Message.ErrorLog = errorLogs([]error{bodyErr}, "Unable to read psqlRequest body", http.StatusBadRequest)
+			leaderboardResponse.Message.ErrorLog = errorLogs([]error{bodyErr}, "Unable to read psqlRequest body", http.StatusBadRequest)
 			return
 		}
-		err := json.Unmarshal(body, &compRequest)
+		err := json.Unmarshal(body, &leaderboardRequest)
 		if err != nil {
-			compResponse.Message.ErrorLog = errorLogs([]error{err}, "Unable to parse psqlRequest", http.StatusBadRequest)
+			leaderboardResponse.Message.ErrorLog = errorLogs([]error{err}, "Unable to parse psqlRequest", http.StatusBadRequest)
 			return
 		}
 
-		compResponse = h.Service.CrawlLeaderboardData(r.Context(), compRequest)
+		leaderboardResponse = h.Service.CrawlLeaderboardData(r.Context(), leaderboardRequest)
+	}
+}
+
+func (h *Handler) AllLeaderboardsHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		startTime := time.Now()
+		var status int
+		var leaderboardResponse response.AllLeaderboardsResponse
+		defer func() {
+			status, leaderboardResponse.Message = setMessage(startTime, leaderboardResponse.Message)
+			_ = json.NewEncoder(writeHeader(w, status)).Encode(leaderboardResponse)
+		}()
+
+		leaderboardResponse = h.Service.CrawlAllLeaderboardData(r.Context())
 	}
 }
 

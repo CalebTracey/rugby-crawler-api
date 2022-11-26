@@ -20,23 +20,44 @@ components:
       description: Request used for fetching leaderboard data
       required: true
   responses:
+    AllLeaderboardsResponse:
+      content:
+        application/json:
+          schema:
+            nullable: true
+            properties:
+              leaderboardDataList:
+                $ref: '#/components/schemas/CompetitionLeaderboardDataList'
+              message:
+                $ref: '#/components/schemas/Message'
+      description: Response with competition data
     LeaderboardResponse:
       content:
         application/json:
           schema:
             nullable: true
             properties:
-              id:
-                nullable: true
-                type: string
+              leaderboardData:
+                $ref: '#/components/schemas/CompetitionLeaderboardData'
               message:
                 $ref: '#/components/schemas/Message'
-              name:
-                type: string
-              teams:
-                $ref: '#/components/schemas/TeamLeaderboardDataList'
       description: Response with competition data
   schemas:
+    CompetitionLeaderboardData:
+      properties:
+        compId:
+          nullable: true
+          type: string
+        compName:
+          nullable: true
+          type: string
+        teams:
+          $ref: '#/components/schemas/TeamLeaderboardDataList'
+      type: object
+    CompetitionLeaderboardDataList:
+      items:
+        $ref: '#/components/schemas/CompetitionLeaderboardData'
+      type: array
     ErrorLog:
       properties:
         query:
@@ -117,6 +138,9 @@ components:
         points_for:
           nullable: true
           type: string
+        team_abbr:
+          nullable: true
+          type: string
         team_id:
           nullable: true
           type: string
@@ -137,7 +161,7 @@ components:
       items:
         $ref: '#/components/schemas/PSQLLeaderboardData'
       type: array
-    TeamLeaderboardData:
+    TeamCompetitionStats:
       properties:
         bonusPoints:
           nullable: true
@@ -157,13 +181,7 @@ components:
         gamesPlayed:
           nullable: true
           type: string
-        id:
-          nullable: true
-          type: string
         lossCount:
-          nullable: true
-          type: string
-        name:
           nullable: true
           type: string
         points:
@@ -185,6 +203,20 @@ components:
           nullable: true
           type: string
         winCount:
+          nullable: true
+          type: string
+      type: object
+    TeamLeaderboardData:
+      properties:
+        abbr:
+          nullable: true
+          type: string
+        competitionStats:
+          $ref: '#/components/schemas/TeamCompetitionStats'
+        id:
+          nullable: true
+          type: string
+        name:
           nullable: true
           type: string
       type: object
@@ -216,6 +248,17 @@ paths:
           $ref: '#/components/responses/LeaderboardResponse'
         "500":
           $ref: '#/components/responses/LeaderboardResponse'
+  /leaderboards:
+    description: All Leaderboard Data
+    get:
+      operationId: GetAllLeaderboardData
+      responses:
+        "201":
+          $ref: '#/components/responses/AllLeaderboardsResponse'
+        "400":
+          $ref: '#/components/responses/AllLeaderboardsResponse'
+        "500":
+          $ref: '#/components/responses/AllLeaderboardsResponse'
 servers:
 - description: Local development
   url: http://0.0.0.0:6080

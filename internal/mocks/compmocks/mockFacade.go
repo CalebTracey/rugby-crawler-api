@@ -36,6 +36,20 @@ func (m *MockFacadeI) EXPECT() *MockFacadeIMockRecorder {
 	return m.recorder
 }
 
+// CrawlAllLeaderboards mocks base method.
+func (m *MockFacadeI) CrawlAllLeaderboards(arg0 context.Context) response.AllLeaderboardsResponse {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CrawlAllLeaderboards", arg0)
+	ret0, _ := ret[0].(response.AllLeaderboardsResponse)
+	return ret0
+}
+
+// CrawlAllLeaderboards indicates an expected call of CrawlAllLeaderboards.
+func (mr *MockFacadeIMockRecorder) CrawlAllLeaderboards(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CrawlAllLeaderboards", reflect.TypeOf((*MockFacadeI)(nil).CrawlAllLeaderboards), arg0)
+}
+
 // CrawlLeaderboard mocks base method.
 func (m *MockFacadeI) CrawlLeaderboard(arg0 context.Context, arg1 request.LeaderboardRequest) response.LeaderboardResponse {
 	m.ctrl.T.Helper()

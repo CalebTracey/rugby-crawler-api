@@ -12,6 +12,7 @@ import (
 //go:generate mockgen -destination=../mocks/mockFacade.go -package=mocks . APIFacadeI
 type APIFacadeI interface {
 	CrawlLeaderboardData(ctx context.Context, req request.LeaderboardRequest) (resp response.LeaderboardResponse)
+	CrawlAllLeaderboardData(ctx context.Context) (resp response.AllLeaderboardsResponse)
 }
 
 type APIFacade struct {
@@ -22,5 +23,12 @@ func (s APIFacade) CrawlLeaderboardData(ctx context.Context, req request.Leaderb
 	//TODO add request validation
 	resp = s.CompService.CrawlLeaderboard(ctx, req)
 
+	return resp
+}
+
+func (s APIFacade) CrawlAllLeaderboardData(ctx context.Context) (resp response.AllLeaderboardsResponse) {
+	//TODO add request validation
+	resp = s.CompService.CrawlAllLeaderboards(ctx)
+	//TODO add response mapping func
 	return resp
 }
