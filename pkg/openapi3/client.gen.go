@@ -91,6 +91,9 @@ type ClientInterface interface {
 	GetLeaderboardDataWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	GetLeaderboardData(ctx context.Context, body GetLeaderboardDataJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetAllLeaderboardData request
+	GetAllLeaderboardData(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) GetLeaderboardDataWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -107,6 +110,18 @@ func (c *Client) GetLeaderboardDataWithBody(ctx context.Context, contentType str
 
 func (c *Client) GetLeaderboardData(ctx context.Context, body GetLeaderboardDataJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetLeaderboardDataRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetAllLeaderboardData(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetAllLeaderboardDataRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -153,6 +168,33 @@ func NewGetLeaderboardDataRequestWithBody(server string, contentType string, bod
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetAllLeaderboardDataRequest generates requests for GetAllLeaderboardData
+func NewGetAllLeaderboardDataRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/leaderboards")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -204,28 +246,25 @@ type ClientWithResponsesInterface interface {
 	GetLeaderboardDataWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GetLeaderboardDataResponse, error)
 
 	GetLeaderboardDataWithResponse(ctx context.Context, body GetLeaderboardDataJSONRequestBody, reqEditors ...RequestEditorFn) (*GetLeaderboardDataResponse, error)
+
+	// GetAllLeaderboardData request
+	GetAllLeaderboardDataWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetAllLeaderboardDataResponse, error)
 }
 
 type GetLeaderboardDataResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *struct {
-		Id      *string                  `json:"id"`
-		Message *Message                 `json:"message,omitempty"`
-		Name    *string                  `json:"name,omitempty"`
-		Teams   *TeamLeaderboardDataList `json:"teams,omitempty"`
+		LeaderboardData *CompetitionLeaderboardData `json:"leaderboardData,omitempty"`
+		Message         *Message                    `json:"message,omitempty"`
 	}
 	JSON400 *struct {
-		Id      *string                  `json:"id"`
-		Message *Message                 `json:"message,omitempty"`
-		Name    *string                  `json:"name,omitempty"`
-		Teams   *TeamLeaderboardDataList `json:"teams,omitempty"`
+		LeaderboardData *CompetitionLeaderboardData `json:"leaderboardData,omitempty"`
+		Message         *Message                    `json:"message,omitempty"`
 	}
 	JSON500 *struct {
-		Id      *string                  `json:"id"`
-		Message *Message                 `json:"message,omitempty"`
-		Name    *string                  `json:"name,omitempty"`
-		Teams   *TeamLeaderboardDataList `json:"teams,omitempty"`
+		LeaderboardData *CompetitionLeaderboardData `json:"leaderboardData,omitempty"`
+		Message         *Message                    `json:"message,omitempty"`
 	}
 }
 
@@ -239,6 +278,39 @@ func (r GetLeaderboardDataResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetLeaderboardDataResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetAllLeaderboardDataResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *struct {
+		LeaderboardDataList *CompetitionLeaderboardDataList `json:"leaderboardDataList,omitempty"`
+		Message             *Message                        `json:"message,omitempty"`
+	}
+	JSON400 *struct {
+		LeaderboardDataList *CompetitionLeaderboardDataList `json:"leaderboardDataList,omitempty"`
+		Message             *Message                        `json:"message,omitempty"`
+	}
+	JSON500 *struct {
+		LeaderboardDataList *CompetitionLeaderboardDataList `json:"leaderboardDataList,omitempty"`
+		Message             *Message                        `json:"message,omitempty"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r GetAllLeaderboardDataResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetAllLeaderboardDataResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -262,6 +334,15 @@ func (c *ClientWithResponses) GetLeaderboardDataWithResponse(ctx context.Context
 	return ParseGetLeaderboardDataResponse(rsp)
 }
 
+// GetAllLeaderboardDataWithResponse request returning *GetAllLeaderboardDataResponse
+func (c *ClientWithResponses) GetAllLeaderboardDataWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetAllLeaderboardDataResponse, error) {
+	rsp, err := c.GetAllLeaderboardData(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetAllLeaderboardDataResponse(rsp)
+}
+
 // ParseGetLeaderboardDataResponse parses an HTTP response from a GetLeaderboardDataWithResponse call
 func ParseGetLeaderboardDataResponse(rsp *http.Response) (*GetLeaderboardDataResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -278,10 +359,8 @@ func ParseGetLeaderboardDataResponse(rsp *http.Response) (*GetLeaderboardDataRes
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest struct {
-			Id      *string                  `json:"id"`
-			Message *Message                 `json:"message,omitempty"`
-			Name    *string                  `json:"name,omitempty"`
-			Teams   *TeamLeaderboardDataList `json:"teams,omitempty"`
+			LeaderboardData *CompetitionLeaderboardData `json:"leaderboardData,omitempty"`
+			Message         *Message                    `json:"message,omitempty"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -290,10 +369,8 @@ func ParseGetLeaderboardDataResponse(rsp *http.Response) (*GetLeaderboardDataRes
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest struct {
-			Id      *string                  `json:"id"`
-			Message *Message                 `json:"message,omitempty"`
-			Name    *string                  `json:"name,omitempty"`
-			Teams   *TeamLeaderboardDataList `json:"teams,omitempty"`
+			LeaderboardData *CompetitionLeaderboardData `json:"leaderboardData,omitempty"`
+			Message         *Message                    `json:"message,omitempty"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -302,10 +379,57 @@ func ParseGetLeaderboardDataResponse(rsp *http.Response) (*GetLeaderboardDataRes
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest struct {
-			Id      *string                  `json:"id"`
-			Message *Message                 `json:"message,omitempty"`
-			Name    *string                  `json:"name,omitempty"`
-			Teams   *TeamLeaderboardDataList `json:"teams,omitempty"`
+			LeaderboardData *CompetitionLeaderboardData `json:"leaderboardData,omitempty"`
+			Message         *Message                    `json:"message,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetAllLeaderboardDataResponse parses an HTTP response from a GetAllLeaderboardDataWithResponse call
+func ParseGetAllLeaderboardDataResponse(rsp *http.Response) (*GetAllLeaderboardDataResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetAllLeaderboardDataResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest struct {
+			LeaderboardDataList *CompetitionLeaderboardDataList `json:"leaderboardDataList,omitempty"`
+			Message             *Message                        `json:"message,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			LeaderboardDataList *CompetitionLeaderboardDataList `json:"leaderboardDataList,omitempty"`
+			Message             *Message                        `json:"message,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			LeaderboardDataList *CompetitionLeaderboardDataList `json:"leaderboardDataList,omitempty"`
+			Message             *Message                        `json:"message,omitempty"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err

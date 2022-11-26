@@ -23,24 +23,27 @@ func (s DAO) CrawlLeaderboardData(url string) (resp response.LeaderboardResponse
 		e.ForEach("tr", func(_ int, el *colly.HTMLElement) {
 			href := el.ChildAttr("a.react-router-link", "href")
 			team := dtos.TeamLeaderboardData{
-				Id:                re.FindAllString(href, -1)[0],
-				Name:              el.ChildText("span.team-names"),
-				GamesPlayed:       el.ChildText("td:nth-child(2)"),
-				WinCount:          el.ChildText("td:nth-child(3)"),
-				DrawCount:         el.ChildText("td:nth-child(4)"),
-				LossCount:         el.ChildText("td:nth-child(5)"),
-				Bye:               el.ChildText("td:nth-child(6)"),
-				PointsFor:         el.ChildText("td:nth-child(7)"),
-				PointsAgainst:     el.ChildText("td:nth-child(8)"),
-				TriesFor:          el.ChildText("td:nth-child(9)"),
-				TriesAgainst:      el.ChildText("td:nth-child(10)"),
-				BonusPointsTry:    el.ChildText("td:nth-child(11)"),
-				BonusPointsLosing: el.ChildText("td:nth-child(12)"),
-				BonusPoints:       el.ChildText("td:nth-child(13)"),
-				PointsDiff:        el.ChildText("td:nth-child(14)"),
-				Points:            el.ChildText("td:nth-child(15)"),
+				Id:   re.FindString(href),
+				Name: el.ChildText("span.team-names"),
+				Abbr: el.ChildText("abbr"),
+				CompetitionStats: dtos.TeamCompetitionStats{
+					GamesPlayed:       el.ChildText("td:nth-child(2)"),
+					WinCount:          el.ChildText("td:nth-child(3)"),
+					DrawCount:         el.ChildText("td:nth-child(4)"),
+					LossCount:         el.ChildText("td:nth-child(5)"),
+					Bye:               el.ChildText("td:nth-child(6)"),
+					PointsFor:         el.ChildText("td:nth-child(7)"),
+					PointsAgainst:     el.ChildText("td:nth-child(8)"),
+					TriesFor:          el.ChildText("td:nth-child(9)"),
+					TriesAgainst:      el.ChildText("td:nth-child(10)"),
+					BonusPointsTry:    el.ChildText("td:nth-child(11)"),
+					BonusPointsLosing: el.ChildText("td:nth-child(12)"),
+					BonusPoints:       el.ChildText("td:nth-child(13)"),
+					PointsDiff:        el.ChildText("td:nth-child(14)"),
+					Points:            el.ChildText("td:nth-child(15)"),
+				},
 			}
-			resp.Teams = append(resp.Teams, team)
+			resp.LeaderboardData.Teams = append(resp.LeaderboardData.Teams, team)
 
 		})
 	})

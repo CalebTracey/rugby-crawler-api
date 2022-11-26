@@ -29,7 +29,7 @@ func initializeDAO(config config.Config) (facade.APIFacadeI, error) {
 			CompDAO: compdao.DAO{
 				Collector: crawlerConfig.Collector,
 			},
-			CompMapper: compdao.Mapper{},
+			DbMapper: psql.Mapper{},
 		},
 	}, nil
 }
