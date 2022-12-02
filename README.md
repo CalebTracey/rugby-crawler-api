@@ -1,5 +1,7 @@
 # rugby-crawler-api
 
+[![codecov](https://codecov.io/gh/CalebTracey/rugby-crawler-api/branch/main/graph/badge.svg?token=8KO1YT3COM)](https://codecov.io/gh/CalebTracey/rugby-crawler-api)
+
 ### Go REST API for scraping rugby stats
 ### [Swagger Docs](https://calebtracey.github.io/rugby-crawler-api/swagger-ui/)
 ---
