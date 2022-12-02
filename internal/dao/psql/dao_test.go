@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/calebtracey/rugby-models/pkg/dtos/response"
 	log "github.com/sirupsen/logrus"
 	"reflect"
 	"testing"
@@ -25,7 +25,7 @@ func TestDAO_InsertOne(t *testing.T) {
 		ctx       context.Context
 		exec      string
 		wantResp  sql.Result
-		wantErr   *response.ErrorLog
+		wantErr   error
 		mockErr   error
 		expectErr bool
 	}{
@@ -38,26 +38,20 @@ func TestDAO_InsertOne(t *testing.T) {
 			expectErr: false,
 		},
 		{
-			name: "Sad Path",
-			DB:   db,
-			ctx:  context.Background(),
-			exec: ``,
-			wantErr: &response.ErrorLog{
-				StatusCode: "500",
-				RootCause:  "error",
-			},
-			mockErr:   errors.New("error"),
+			name:      "Sad Path",
+			DB:        db,
+			ctx:       context.Background(),
+			exec:      ``,
+			wantErr:   fmt.Errorf("%w: %s", ErrInsertOne, "test"),
+			mockErr:   errors.New("test"),
 			expectErr: true,
 		},
 		{
-			name: "Sad Path - no rows",
-			DB:   db,
-			ctx:  context.Background(),
-			exec: ``,
-			wantErr: &response.ErrorLog{
-				StatusCode: "404",
-				RootCause:  "Not found in database",
-			},
+			name:      "Sad Path - no rows",
+			DB:        db,
+			ctx:       context.Background(),
+			exec:      ``,
+			wantErr:   fmt.Errorf("%w: %s", ErrInsertOne, sql.ErrNoRows),
 			mockErr:   sql.ErrNoRows,
 			expectErr: true,
 		},
