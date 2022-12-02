@@ -78,7 +78,7 @@ func (s Facade) CrawlAllLeaderboards(ctx context.Context) (resp leaderboard.Resp
 	if err := g.Wait(); err != nil {
 		log.Error(err)
 		resp.Message.ErrorLog = response.ErrorLogs{
-			*mapError(err, fmt.Sprintf("%s", "all leaderboards query")),
+			*mapError(err, "all leaderboards query"),
 		}
 	}
 	resp.LeaderboardData = results
