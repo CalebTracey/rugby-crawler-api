@@ -1,23 +1,23 @@
 package comp
 
 import (
+	"fmt"
 	"github.com/calebtracey/rugby-models/pkg/dtos"
-	"github.com/calebtracey/rugby-models/pkg/dtos/response"
 	"github.com/gocolly/colly"
 	log "github.com/sirupsen/logrus"
 	"regexp"
 )
 
-//go:generate mockgen -destination=../../mocks/compmocks/mockDao.go -package=compmocks . DAOI
+//go:generate mockgen -source=dao.go -destination=../../mocks/compmocks/mockDao.go -package=compmocks
 type DAOI interface {
-	CrawlLeaderboardData(url string) (resp response.LeaderboardResponse, log *response.ErrorLog)
+	CrawlLeaderboardData(url string) (resp dtos.CompetitionLeaderboardData, err error)
 }
 
 type DAO struct {
 	Collector *colly.Collector
 }
 
-func (s DAO) CrawlLeaderboardData(url string) (resp response.LeaderboardResponse, errLog *response.ErrorLog) {
+func (s DAO) CrawlLeaderboardData(url string) (resp dtos.CompetitionLeaderboardData, err error) {
 	s.Collector.OnHTML("table.standings > tbody", func(e *colly.HTMLElement) {
 		re := regexp.MustCompile("[0-9]+")
 		e.ForEach("tr", func(_ int, el *colly.HTMLElement) {
@@ -43,28 +43,15 @@ func (s DAO) CrawlLeaderboardData(url string) (resp response.LeaderboardResponse
 					Points:            el.ChildText("td:nth-child(15)"),
 				},
 			}
-			resp.LeaderboardData.Teams = append(resp.LeaderboardData.Teams, team)
-
+			resp.Teams = append(resp.Teams, team)
 		})
 	})
-	err := s.Collector.Visit(url)
+	err = s.Collector.Visit(url)
 	if err != nil {
 		log.Error(err)
-		errLog = mapError(err, url)
-		return resp, errLog
+		return resp, fmt.Errorf("error crawling leaderboard data: %w", err)
 	}
 
 	s.Collector.Wait()
 	return resp, nil
-}
-
-func mapError(err error, query string) (errLog *response.ErrorLog) {
-	errLog = &response.ErrorLog{
-		Query: query,
-	}
-	if err != nil {
-		errLog.RootCause = err.Error()
-	}
-	errLog.StatusCode = "500"
-	return errLog
 }

@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/calebtracey/rugby-crawler-api/internal/facade/comp"
 	"github.com/calebtracey/rugby-crawler-api/internal/mocks/compmocks"
-	"github.com/calebtracey/rugby-models/pkg/dtos/request"
-	"github.com/calebtracey/rugby-models/pkg/dtos/response"
+	"github.com/calebtracey/rugby-models/pkg/dtos"
+	"github.com/calebtracey/rugby-models/pkg/dtos/leaderboard"
 	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
@@ -13,26 +13,33 @@ import (
 
 func TestAPIFacade_CrawlLeaderboardData(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 	mockLeaderboardService := compmocks.NewMockFacadeI(ctrl)
+	defer ctrl.Finish()
+
 	type args struct {
 		ctx context.Context
-		req request.LeaderboardRequest
+		req leaderboard.Request
 	}
 	tests := []struct {
 		name        string
 		CompService comp.FacadeI
 		args        args
-		wantResp    response.LeaderboardResponse
+		wantResp    leaderboard.Response
 	}{
 		{
 			name: "Happy Path",
 			args: args{
 				ctx: context.Background(),
-				req: request.LeaderboardRequest{},
+				req: leaderboard.Request{
+					Competitions: dtos.CompetitionList{
+						{
+							Name: "six nations",
+						},
+					},
+				},
 			},
 			CompService: mockLeaderboardService,
-			wantResp:    response.LeaderboardResponse{},
+			wantResp:    leaderboard.Response{},
 		},
 	}
 	for _, tt := range tests {
@@ -42,7 +49,7 @@ func TestAPIFacade_CrawlLeaderboardData(t *testing.T) {
 			}
 			mockLeaderboardService.EXPECT().CrawlLeaderboard(tt.args.ctx, tt.args.req).Return(tt.wantResp)
 			if gotResp := s.CrawlLeaderboardData(tt.args.ctx, tt.args.req); !reflect.DeepEqual(gotResp, tt.wantResp) {
-				t.Errorf("CrawlLeaderboardData() = %v, want %v", gotResp, tt.wantResp)
+				t.Errorf("CrawlLeaderboardData() = %#v, want %#v", gotResp, tt.wantResp)
 			}
 		})
 	}

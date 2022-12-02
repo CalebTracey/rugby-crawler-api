@@ -2,21 +2,24 @@ package comp
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/comp"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/psql"
 	"github.com/calebtracey/rugby-models/pkg/dtos"
-	"github.com/calebtracey/rugby-models/pkg/dtos/request"
+	"github.com/calebtracey/rugby-models/pkg/dtos/leaderboard"
 	"github.com/calebtracey/rugby-models/pkg/dtos/response"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"strings"
 )
 
-//go:generate mockgen -destination=../../mocks/compmocks/mockFacade.go -package=compmocks . FacadeI
+//go:generate mockgen -source=compFacade.go -destination=../../mocks/compmocks/mockFacade.go -package=compmocks
 type FacadeI interface {
-	CrawlLeaderboard(ctx context.Context, req request.LeaderboardRequest) (resp response.LeaderboardResponse)
-	CrawlAllLeaderboards(ctx context.Context) (resp response.AllLeaderboardsResponse)
+	CrawlLeaderboard(ctx context.Context, req leaderboard.Request) (resp leaderboard.Response)
+	CrawlAllLeaderboards(ctx context.Context) (resp leaderboard.Response)
 }
 
 type Facade struct {
@@ -25,63 +28,112 @@ type Facade struct {
 	DbMapper psql.MapperI
 }
 
-func (s Facade) CrawlLeaderboard(ctx context.Context, req request.LeaderboardRequest) (resp response.LeaderboardResponse) {
-	compName, compId := getCompId(req.CompName)
-	url := buildCrawlerUrl(compId)
-	resp, err := s.CompDAO.CrawlLeaderboardData(url)
-	if err != nil {
-		log.Error(err)
-		return response.LeaderboardResponse{
-			Message: response.Message{
-				ErrorLog: response.ErrorLogs{
-					*err,
-				},
-			},
-		}
-	}
-	resp.LeaderboardData.CompName = compName
-	resp.LeaderboardData.CompId = compId
-	//TODO make this concurrent
-	for _, team := range resp.LeaderboardData.Teams {
-		exec := s.DbMapper.CreateInsertLeaderboardExec(compId, compName, team)
-		_, dbErr := s.DbDAO.InsertOne(ctx, exec)
-		if dbErr != nil {
-			log.Error(dbErr)
-			return response.LeaderboardResponse{
-				Message: response.Message{
-					ErrorLog: response.ErrorLogs{
-						*dbErr,
-					},
-				},
-			}
-		}
-	}
-	//TODO make better response struct and add mapping
-	return resp
-}
+func (s Facade) CrawlLeaderboard(ctx context.Context, req leaderboard.Request) (resp leaderboard.Response) {
+	g, ctx := errgroup.WithContext(ctx)
+	results := make([]dtos.CompetitionLeaderboardData, len(req.Competitions))
 
-func (s Facade) CrawlAllLeaderboards(ctx context.Context) (resp response.AllLeaderboardsResponse) {
-	var req request.LeaderboardRequest
-	//TODO make this concurrent
-	for name, id := range CompMap {
-		req.CompName = name
-		req.CompId = id
-		lb := s.CrawlLeaderboard(ctx, req)
-		//TODO make a mapping func for this
-		resp.LeaderboardDataList = append(resp.LeaderboardDataList, dtos.CompetitionLeaderboardData{
-			CompId:   id,
-			CompName: name,
-			Teams:    lb.LeaderboardData.Teams,
+	for i, competition := range req.Competitions {
+		i, competition := i, competition
+		compName, compId := compId(competition.Name)
+
+		g.Go(func() error {
+			leaderboardData, err := crawlLeaderboard(ctx, compName, compId, s)
+
+			if err == nil {
+				results[i] = leaderboardData
+			}
+			return err
 		})
 	}
+
+	if err := g.Wait(); err != nil {
+		log.Error(err)
+		resp.Message.ErrorLog = response.ErrorLogs{
+			*mapError(err, fmt.Sprintf("%s", req)),
+		}
+	}
+	resp.LeaderboardData = results
+
 	return resp
 }
 
-func buildCrawlerUrl(compId string) string {
+func (s Facade) CrawlAllLeaderboards(ctx context.Context) (resp leaderboard.Response) {
+	g, ctx := errgroup.WithContext(ctx)
+	results := make([]dtos.CompetitionLeaderboardData, len(competitions))
+	idx := 0
+	for competitionName, competitionId := range competitions {
+		competitionName, competitionId := competitionName, competitionId
+
+		g.Go(func() error {
+			leaderboardData, err := crawlLeaderboard(ctx, competitionName, competitionId, s)
+
+			if err == nil {
+				results[idx] = leaderboardData
+			}
+			idx++
+			return err
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		log.Error(err)
+		resp.Message.ErrorLog = response.ErrorLogs{
+			*mapError(err, fmt.Sprintf("%s", "all leaderboards query")),
+		}
+	}
+	resp.LeaderboardData = results
+
+	return resp
+}
+
+func crawlLeaderboard(ctx context.Context, name, id string, s Facade) (dtos.CompetitionLeaderboardData, error) {
+	leaderboardData, err := s.CompDAO.CrawlLeaderboardData(crawlerUrl(id))
+	if err != nil {
+		return dtos.CompetitionLeaderboardData{}, fmt.Errorf("error crawling leaderboard: %w", err)
+	}
+	leaderboardData.CompId = id
+	leaderboardData.CompName = name
+
+	for _, team := range leaderboardData.Teams {
+		team := team
+		if err = insertLeaderboardData(ctx, name, id, team, s); err != nil {
+
+			return dtos.CompetitionLeaderboardData{}, fmt.Errorf("error while inserting teams: %w", err)
+		}
+	}
+
+	return leaderboardData, nil
+}
+
+func insertLeaderboardData(ctx context.Context, name, id string, team dtos.TeamLeaderboardData, s Facade) error {
+	if _, dbErr := s.DbDAO.InsertOne(ctx, s.DbMapper.CreateInsertLeaderboardExec(id, name, team)); dbErr != nil {
+		return dbErr
+	}
+
+	return nil
+}
+
+func mapError(err error, query string) (errLog *response.ErrorLog) {
+	errLog = &response.ErrorLog{
+		Query: query,
+	}
+	if err == sql.ErrNoRows {
+		errLog.RootCause = "Not found in database"
+		errLog.StatusCode = "404"
+		return errLog
+	}
+	if err != nil {
+		errLog.RootCause = err.Error()
+	}
+	errLog.StatusCode = "500"
+	return errLog
+}
+
+func crawlerUrl(compId string) string {
 	return strings.Join([]string{CrawlBaseUrl, CrawlCompField, compId}, "")
 }
 
-func getCompId(compName string) (string, string) {
+func compId(compName string) (string, string) {
 	c := cases.Title(language.English)
 	switch c.String(compName) {
 	case SixNations:
@@ -102,7 +154,7 @@ func getCompId(compName string) (string, string) {
 }
 
 var (
-	CompMap = map[string]string{
+	competitions = map[string]string{
 		SixNations:              SixNationsId,
 		RugbyWorldCup:           RugbyWorldCupId,
 		Premiership:             PremiershipId,

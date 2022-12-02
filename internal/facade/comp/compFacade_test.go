@@ -4,13 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/comp"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/psql"
 	"github.com/calebtracey/rugby-crawler-api/internal/mocks/compmocks"
 	"github.com/calebtracey/rugby-crawler-api/internal/mocks/dbmocks"
 	"github.com/calebtracey/rugby-models/pkg/dtos"
-	"github.com/calebtracey/rugby-models/pkg/dtos/request"
+	"github.com/calebtracey/rugby-models/pkg/dtos/leaderboard"
 	"github.com/calebtracey/rugby-models/pkg/dtos/response"
 	"github.com/golang/mock/gomock"
 	"reflect"
@@ -18,7 +19,6 @@ import (
 )
 
 func TestFacade_CrawlLeaderboard(t *testing.T) {
-	_, mock, _ := sqlmock.New()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockDbDao := dbmocks.NewMockDAOI(ctrl)
@@ -31,21 +31,21 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 	}
 	type args struct {
 		ctx context.Context
-		req request.LeaderboardRequest
+		req leaderboard.Request
 	}
 	tests := []struct {
-		name                  string
-		fields                fields
-		args                  args
-		exec                  string
-		url                   string
-		wantResp              response.LeaderboardResponse
-		wantCrawlResp         response.LeaderboardResponse
-		mockDbRes             sql.Result
-		mockDbErr             *response.ErrorLog
-		mockLeaderboardDAOErr *response.ErrorLog
-		expectCrawlError      bool
-		expectDbError         bool
+		name             string
+		fields           fields
+		args             args
+		exec             string
+		url              string
+		wantResp         leaderboard.Response
+		wantCrawlResp    dtos.CompetitionLeaderboardData
+		wantCrawlError   error
+		mockDbRes        sql.Result
+		mockDbErr        error
+		expectCrawlError bool
+		expectDbError    bool
 	}{
 		{
 			name: "Happy Path",
@@ -56,37 +56,54 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				req: request.LeaderboardRequest{
-					CompName: "six nations",
+				req: leaderboard.Request{
+					Competitions: dtos.CompetitionList{
+						{
+							Name: "six nations",
+						},
+					},
 				},
 			},
 			exec: ``,
 			url:  "https://www.espn.co.uk/rugby/table/_/league/180659",
-			wantCrawlResp: response.LeaderboardResponse{
-				LeaderboardData: dtos.CompetitionLeaderboardData{
-					CompId:   "180659",
-					CompName: "Six Nations",
-					Teams: dtos.TeamLeaderboardDataList{
-						{},
+			wantCrawlResp: dtos.CompetitionLeaderboardData{
+				CompId:   SixNationsId,
+				CompName: SixNations,
+				Teams: dtos.TeamLeaderboardDataList{
+					{
+						Id:   "1",
+						Name: "Team 1",
+					},
+					{
+						Id:   "2",
+						Name: "Team 2",
+					},
+				},
+			},
+			wantCrawlError: nil,
+			wantResp: leaderboard.Response{
+				LeaderboardData: dtos.CompetitionLeaderboardDataList{
+					{
+						CompId:   SixNationsId,
+						CompName: SixNations,
+						Teams: dtos.TeamLeaderboardDataList{
+							{
+								Id:   "1",
+								Name: "Team 1",
+							},
+							{
+								Id:   "2",
+								Name: "Team 2",
+							},
+						},
 					},
 				},
 				Message: response.Message{},
 			},
-			wantResp: response.LeaderboardResponse{
-				LeaderboardData: dtos.CompetitionLeaderboardData{
-					CompId:   "180659",
-					CompName: "Six Nations",
-					Teams: dtos.TeamLeaderboardDataList{
-						{},
-					},
-				},
-				Message: response.Message{},
-			},
-			mockDbRes:             sqlmock.NewResult(int64(4), int64(12312123123)),
-			mockDbErr:             nil,
-			mockLeaderboardDAOErr: nil,
-			expectCrawlError:      false,
-			expectDbError:         false,
+			mockDbRes:        sqlmock.NewResult(int64(4), int64(12312123123)),
+			mockDbErr:        nil,
+			expectCrawlError: false,
+			expectDbError:    false,
 		},
 		{
 			name: "Sad Path - crawl error",
@@ -97,45 +114,44 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				req: request.LeaderboardRequest{
-					CompName: "Six Nations",
+				req: leaderboard.Request{
+					Competitions: dtos.CompetitionList{
+						{
+							Name: "six nations",
+						},
+					},
 				},
 			},
-			exec: ``,
-			url:  "https://www.espn.co.uk/rugby/table/_/league/180659",
-			wantCrawlResp: response.LeaderboardResponse{
+			exec:          ``,
+			url:           "https://www.espn.co.uk/rugby/table/_/league/180659",
+			wantCrawlResp: dtos.CompetitionLeaderboardData{},
+			wantResp: leaderboard.Response{
+				LeaderboardData: dtos.CompetitionLeaderboardDataList{
+					{
+						CompId:   "",
+						CompName: "",
+						Teams:    dtos.TeamLeaderboardDataList(nil),
+					},
+				},
 				Message: response.Message{
 					ErrorLog: response.ErrorLogs{
 						{
-							Query:      "https://test.url",
-							RootCause:  "error",
+							Query: fmt.Sprintf("%s", leaderboard.Request{
+								Competitions: dtos.CompetitionList{
+									{
+										Name: "six nations",
+									},
+								},
+							}),
+							RootCause:  "error crawling leaderboard: error",
 							StatusCode: "500",
 						},
 					},
 				},
 			},
-			wantResp: response.LeaderboardResponse{
-				Message: response.Message{
-					ErrorLog: response.ErrorLogs{
-						{
-							Query:      "https://test.url",
-							RootCause:  "error",
-							StatusCode: "500",
-						},
-					},
-				},
-			},
-			mockDbRes: sqlmock.NewResult(int64(4), int64(12312123123)),
-			mockDbErr: &response.ErrorLog{
-				Query:      ``,
-				RootCause:  "db error",
-				StatusCode: "500",
-			},
-			mockLeaderboardDAOErr: &response.ErrorLog{
-				Query:      "https://test.url",
-				RootCause:  "error",
-				StatusCode: "500",
-			},
+			mockDbRes:        sqlmock.NewResult(int64(4), int64(12312123123)),
+			mockDbErr:        errors.New("db error"),
+			wantCrawlError:   errors.New("error"),
 			expectCrawlError: true,
 			expectDbError:    false,
 		},
@@ -148,44 +164,57 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				req: request.LeaderboardRequest{
-					CompName: "Six Nations",
+				req: leaderboard.Request{
+					Competitions: dtos.CompetitionList{
+						{
+							Name: "six nations",
+						},
+					},
 				},
 			},
 			exec: ``,
 			url:  "https://www.espn.co.uk/rugby/table/_/league/180659",
-			wantCrawlResp: response.LeaderboardResponse{
-				LeaderboardData: dtos.CompetitionLeaderboardData{
-					CompId:   "180659",
-					CompName: "Nations",
-					Teams: dtos.TeamLeaderboardDataList{
-						{},
+			wantCrawlResp: dtos.CompetitionLeaderboardData{
+				CompId:   SixNationsId,
+				CompName: SixNations,
+				Teams: dtos.TeamLeaderboardDataList{
+					{
+						Id:   "1",
+						Name: "Team 1",
+					},
+					{
+						Id:   "2",
+						Name: "Team 2",
 					},
 				},
-				Message: response.Message{},
 			},
-			wantResp: response.LeaderboardResponse{
+			wantResp: leaderboard.Response{
+				LeaderboardData: dtos.CompetitionLeaderboardDataList{
+					{
+						CompId:   "",
+						CompName: "",
+						Teams:    dtos.TeamLeaderboardDataList(nil),
+					},
+				},
 				Message: response.Message{
 					ErrorLog: response.ErrorLogs{
 						{
-							Query:      ``,
-							RootCause:  "db error",
+							Query: fmt.Sprintf("%s", leaderboard.Request{
+								Competitions: dtos.CompetitionList{
+									{
+										Name: "six nations",
+									},
+								},
+							}),
+							RootCause:  "error crawling leaderboard: error",
 							StatusCode: "500",
 						},
 					},
 				},
 			},
-			mockDbRes: sqlmock.NewResult(int64(4), int64(12312123123)),
-			mockDbErr: &response.ErrorLog{
-				Query:      ``,
-				RootCause:  "db error",
-				StatusCode: "500",
-			},
-			mockLeaderboardDAOErr: &response.ErrorLog{
-				Query:      "https://test.url",
-				RootCause:  "error",
-				StatusCode: "500",
-			},
+			mockDbRes:        sqlmock.NewResult(int64(4), int64(12312123123)),
+			mockDbErr:        errors.New("db error"),
+			wantCrawlError:   errors.New("error"),
 			expectCrawlError: false,
 			expectDbError:    true,
 		},
@@ -197,25 +226,17 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 				CompDAO:  tt.fields.CompDAO,
 				DbMapper: tt.fields.DbMapper,
 			}
-			mock.ExpectBegin()
-			mockLeaderboardDAO.EXPECT().CrawlLeaderboardData(tt.url).
-				DoAndReturn(func(url string) (response.LeaderboardResponse, *response.ErrorLog) {
-					if tt.expectCrawlError {
-						return tt.wantCrawlResp, tt.mockLeaderboardDAOErr
-					}
-					return tt.wantCrawlResp, nil
-				})
+			mockLeaderboardDAO.EXPECT().CrawlLeaderboardData(tt.url).Return(tt.wantCrawlResp, tt.wantCrawlError)
 			if !tt.expectCrawlError {
-				mockDbMapper.EXPECT().CreateInsertLeaderboardExec(gomock.Any(), gomock.Any(), gomock.Any()).Return(tt.exec)
-				mockDbDao.EXPECT().InsertOne(tt.args.ctx, tt.exec).
-					DoAndReturn(func(ctx context.Context, exec string) (sql.Result, *response.ErrorLog) {
+				mockDbMapper.EXPECT().CreateInsertLeaderboardExec(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(tt.exec).MaxTimes(len(tt.wantCrawlResp.Teams))
+				mockDbDao.EXPECT().InsertOne(gomock.Any(), tt.exec).
+					DoAndReturn(func(ctx context.Context, exec string) (sql.Result, error) {
 						if tt.expectDbError {
-							mock.ExpectExec(tt.exec).WillReturnError(errors.New("db error"))
 							return sqlmock.NewErrorResult(errors.New("db error")), tt.mockDbErr
 						}
-						mock.ExpectExec(tt.exec)
 						return tt.mockDbRes, nil
-					})
+					}).MaxTimes(len(tt.wantCrawlResp.Teams))
 			}
 
 			if gotResp := s.CrawlLeaderboard(tt.args.ctx, tt.args.req); !reflect.DeepEqual(gotResp, tt.wantResp) {

@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-//go:generate mockgen -destination=../../mocks/dbmocks/mockMapper.go -package=dbmocks . MapperI
+//go:generate mockgen -source=mapper.go -destination=../../mocks/dbmocks/mockMapper.go -package=dbmocks
 type MapperI interface {
 	CreateUpdateLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string
 	CreateInsertLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string
