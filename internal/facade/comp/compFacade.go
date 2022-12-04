@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/calebtracey/rugby-crawler-api/internal/dao/comp"
+	lb "github.com/calebtracey/rugby-crawler-api/internal/dao/comp/leaderboard"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/psql"
 	"github.com/calebtracey/rugby-models/pkg/dtos"
 	"github.com/calebtracey/rugby-models/pkg/dtos/leaderboard"
@@ -24,7 +24,7 @@ type FacadeI interface {
 
 type Facade struct {
 	DbDAO    psql.DAOI
-	CompDAO  comp.DAOI
+	LBDao    lb.DAOI
 	DbMapper psql.MapperI
 }
 
@@ -38,7 +38,6 @@ func (s Facade) CrawlLeaderboard(ctx context.Context, req leaderboard.Request) (
 
 		g.Go(func() error {
 			leaderboardData, err := crawlLeaderboard(ctx, compName, compId, s)
-
 			if err == nil {
 				results[i] = leaderboardData
 			}
@@ -61,12 +60,12 @@ func (s Facade) CrawlAllLeaderboards(ctx context.Context) (resp leaderboard.Resp
 	g, ctx := errgroup.WithContext(ctx)
 	results := make([]dtos.CompetitionLeaderboardData, len(competitions))
 	idx := 0
+
 	for competitionName, competitionId := range competitions {
 		competitionName, competitionId := competitionName, competitionId
 
 		g.Go(func() error {
 			leaderboardData, err := crawlLeaderboard(ctx, competitionName, competitionId, s)
-
 			if err == nil {
 				results[idx] = leaderboardData
 			}
@@ -87,30 +86,22 @@ func (s Facade) CrawlAllLeaderboards(ctx context.Context) (resp leaderboard.Resp
 }
 
 func crawlLeaderboard(ctx context.Context, name, id string, s Facade) (dtos.CompetitionLeaderboardData, error) {
-	leaderboardData, err := s.CompDAO.CrawlLeaderboardData(crawlerUrl(id))
+	leaderboardData, err := s.LBDao.CrawlLeaderboardData(crawlerUrl(id))
 	if err != nil {
 		return dtos.CompetitionLeaderboardData{}, fmt.Errorf("error crawling leaderboard: %w", err)
 	}
+
 	leaderboardData.CompId = id
 	leaderboardData.CompName = name
 
 	for _, team := range leaderboardData.Teams {
 		team := team
-		if err = insertLeaderboardData(ctx, name, id, team, s); err != nil {
+		if _, dbErr := s.DbDAO.InsertOne(ctx, s.DbMapper.InsertLeaderboardExec(id, name, team)); dbErr != nil {
 
-			return dtos.CompetitionLeaderboardData{}, fmt.Errorf("error while inserting teams: %w", err)
+			return dtos.CompetitionLeaderboardData{}, fmt.Errorf("error while inserting teams: %w", dbErr)
 		}
 	}
-
 	return leaderboardData, nil
-}
-
-func insertLeaderboardData(ctx context.Context, name, id string, team dtos.TeamLeaderboardData, s Facade) error {
-	if _, dbErr := s.DbDAO.InsertOne(ctx, s.DbMapper.CreateInsertLeaderboardExec(id, name, team)); dbErr != nil {
-		return dbErr
-	}
-
-	return nil
 }
 
 func mapError(err error, query string) (errLog *response.ErrorLog) {
@@ -133,6 +124,7 @@ func crawlerUrl(compId string) string {
 	return strings.Join([]string{CrawlBaseUrl, CrawlCompField, compId}, "")
 }
 
+// compId returns competition name and id based on name match
 func compId(compName string) (string, string) {
 	c := cases.Title(language.English)
 	switch c.String(compName) {

@@ -52,7 +52,6 @@ func (h *Handler) LeaderboardHandler() http.HandlerFunc {
 			apiResponse.Message.ErrorLog = response.ErrorLogs{*err}
 			statusCode = http.StatusInternalServerError
 		}
-
 		response.WriteHeader(w, statusCode)
 	}
 }
@@ -70,7 +69,6 @@ func (h *Handler) AllLeaderboardsHandler() http.HandlerFunc {
 			apiResponse.Message.ErrorLog = response.ErrorLogs{*err}
 			statusCode = http.StatusInternalServerError
 		}
-
 		response.WriteHeader(w, statusCode)
 	}
 }

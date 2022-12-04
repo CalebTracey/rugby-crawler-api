@@ -33,7 +33,9 @@ func ListenAndServe(addr string, handler http.Handler) error {
 
 	go func() {
 		defer wgServer.Done()
+
 		killSignal := <-signals
+
 		switch killSignal {
 		case os.Interrupt:
 			log.Infoln("SIGINT recieved (Control-C ?)")
@@ -43,8 +45,8 @@ func ListenAndServe(addr string, handler http.Handler) error {
 			return
 		}
 		log.Infoln("graceful shutdown...")
-		err := srv.Shutdown(context.Background())
-		if err != nil {
+
+		if err := srv.Shutdown(context.Background()); err != nil {
 			log.Error(err.Error())
 		}
 		log.Infoln("graceful shutdown complete")
@@ -52,13 +54,14 @@ func ListenAndServe(addr string, handler http.Handler) error {
 
 	go func() {
 		defer wgServer.Done()
+
 		if err := srv.ListenAndServe(); err != nil {
 			serverError = err
 		}
 		signals <- nil
 	}()
-
 	wgServer.Wait()
+
 	return serverError
 }
 

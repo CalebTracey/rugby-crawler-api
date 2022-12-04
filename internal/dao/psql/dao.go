@@ -25,5 +25,6 @@ func (s DAO) InsertOne(ctx context.Context, exec string) (resp sql.Result, err e
 	if err != nil {
 		return resp, fmt.Errorf("%w: %s", ErrInsertOne, err)
 	}
+
 	return resp, nil
 }

@@ -1,4 +1,4 @@
-package comp
+package leaderboard
 
 import (
 	"fmt"
@@ -19,13 +19,17 @@ type DAO struct {
 
 func (s DAO) CrawlLeaderboardData(url string) (resp dtos.CompetitionLeaderboardData, err error) {
 	s.Collector.OnHTML("table.standings > tbody", func(e *colly.HTMLElement) {
+
 		re := regexp.MustCompile("[0-9]+")
 		e.ForEach("tr", func(_ int, el *colly.HTMLElement) {
+
 			href := el.ChildAttr("a.react-router-link", "href")
+
 			team := dtos.TeamLeaderboardData{
 				Id:   re.FindString(href),
 				Name: el.ChildText("span.team-names"),
 				Abbr: el.ChildText("abbr"),
+
 				CompetitionStats: dtos.TeamCompetitionStats{
 					GamesPlayed:       el.ChildText("td:nth-child(2)"),
 					WinCount:          el.ChildText("td:nth-child(3)"),
@@ -47,11 +51,12 @@ func (s DAO) CrawlLeaderboardData(url string) (resp dtos.CompetitionLeaderboardD
 		})
 	})
 	err = s.Collector.Visit(url)
+
 	if err != nil {
 		log.Error(err)
 		return resp, fmt.Errorf("error crawling leaderboard data: %w", err)
 	}
-
 	s.Collector.Wait()
+
 	return resp, nil
 }

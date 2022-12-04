@@ -1,25 +1,28 @@
-Env: "local"
-Port: "6080"
-AppName: "rugby-crawler-api"
-ClientConfig:
-  Timeout: 15
-  IdleConnTimeout: 30
-  MaxIdleConsPerHost: 1
-  MaxConsPerHost: 1
-DatabaseConfigs:
+Env: "Local"
+Port: 6080
+AppName: "rugby-data-api"
+ComponentConfigs:
+  Client:
+    Timeout: 15
+    IdleConnTimeout: 15
+    MaxIdleConsPerHost: 50
+    MaxConsPerHost: 0
+    DisableCompression: 2
+    InsecureSkipVerify: 1
+Databases:
   - Name: "PSQL"
     Database: "rugby_db"
     Server: "localhost:5432"
-    Username: "postgres"
+    Username: "calebtracey"
     Scheme: "postgres"
     PasswordEnvVariable: "DB_PASSWORD_LOCAL"
-CrawlerConfigs:
+Crawlers:
   - Name: "COLLY"
     AppsJSONPath: ""
-    TimeoutSeconds: "3"
-    LoadingTimeoutSeconds: "3"
-    JSON: "true"
-    MaxDepth: "0"
-    visitedLinks: "0"
-    MaxVisitedLinks: "100"
-    MsDelayBetweenRequests: "10"
+    TimeoutSeconds: 3
+    LoadingTimeoutSeconds: 3
+    JSON: true
+    MaxDepth: 2
+    visitedLinks: 0
+    MaxVisitedLinks: 100
+    MsDelayBetweenRequests: 10

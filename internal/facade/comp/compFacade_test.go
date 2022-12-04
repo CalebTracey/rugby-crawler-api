@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/calebtracey/rugby-crawler-api/internal/dao/comp"
+	lb "github.com/calebtracey/rugby-crawler-api/internal/dao/comp/leaderboard"
 	"github.com/calebtracey/rugby-crawler-api/internal/dao/psql"
 	"github.com/calebtracey/rugby-crawler-api/internal/mocks/compmocks"
 	"github.com/calebtracey/rugby-crawler-api/internal/mocks/dbmocks"
@@ -26,7 +26,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 	mockDbMapper := dbmocks.NewMockMapperI(ctrl)
 	type fields struct {
 		DbDAO    psql.DAOI
-		CompDAO  comp.DAOI
+		LBDAO    lb.DAOI
 		DbMapper psql.MapperI
 	}
 	type args struct {
@@ -51,7 +51,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			name: "Happy Path",
 			fields: fields{
 				DbDAO:    mockDbDao,
-				CompDAO:  mockLeaderboardDAO,
+				LBDAO:    mockLeaderboardDAO,
 				DbMapper: mockDbMapper,
 			},
 			args: args{
@@ -109,7 +109,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			name: "Sad Path - crawl error",
 			fields: fields{
 				DbDAO:    mockDbDao,
-				CompDAO:  mockLeaderboardDAO,
+				LBDAO:    mockLeaderboardDAO,
 				DbMapper: mockDbMapper,
 			},
 			args: args{
@@ -159,7 +159,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 			name: "Sad Path - database error",
 			fields: fields{
 				DbDAO:    mockDbDao,
-				CompDAO:  mockLeaderboardDAO,
+				LBDAO:    mockLeaderboardDAO,
 				DbMapper: mockDbMapper,
 			},
 			args: args{
@@ -223,7 +223,7 @@ func TestFacade_CrawlLeaderboard(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := Facade{
 				DbDAO:    tt.fields.DbDAO,
-				CompDAO:  tt.fields.CompDAO,
+				LBDao:    tt.fields.LBDAO,
 				DbMapper: tt.fields.DbMapper,
 			}
 			mockLeaderboardDAO.EXPECT().CrawlLeaderboardData(tt.url).Return(tt.wantCrawlResp, tt.wantCrawlError)
