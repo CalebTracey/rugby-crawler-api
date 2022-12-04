@@ -9,13 +9,13 @@ import (
 
 //go:generate mockgen -source=mapper.go -destination=../../mocks/dbmocks/mockMapper.go -package=dbmocks
 type MapperI interface {
-	CreateUpdateLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string
-	CreateInsertLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string
+	UpdateLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string
+	InsertLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string
 }
 
 type Mapper struct{}
 
-func (m Mapper) CreateUpdateLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string {
+func (m Mapper) UpdateLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string {
 	compId, err := strconv.Atoi(compIdStr)
 	if err != nil {
 		log.Error(err)
@@ -25,13 +25,14 @@ func (m Mapper) CreateUpdateLeaderboardExec(compIdStr, compName string, td dtos.
 		log.Error(err)
 	}
 	s := td.CompetitionStats
+
 	return fmt.Sprintf(UpdateLeaderboardExec,
 		compId, compName, teamId, td.Name, td.Abbr, s.GamesPlayed, s.WinCount, s.DrawCount, s.LossCount,
 		s.Bye, s.PointsFor, s.PointsAgainst, s.TriesFor, s.TriesAgainst, s.BonusPointsTry,
 		s.BonusPointsLosing, s.BonusPoints, s.PointsDiff, s.Points, compId)
 }
 
-func (m Mapper) CreateInsertLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string {
+func (m Mapper) InsertLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string {
 	compId, err := strconv.Atoi(compIdStr)
 	if err != nil {
 		log.Error(err)
@@ -41,6 +42,7 @@ func (m Mapper) CreateInsertLeaderboardExec(compIdStr, compName string, td dtos.
 		log.Error(err)
 	}
 	s := td.CompetitionStats
+
 	return fmt.Sprintf(InsertLeaderboardExec,
 		compId, compName, teamId, td.Name, td.Abbr, s.GamesPlayed, s.WinCount, s.DrawCount, s.LossCount,
 		s.Bye, s.PointsFor, s.PointsAgainst, s.TriesFor, s.TriesAgainst, s.BonusPointsTry,

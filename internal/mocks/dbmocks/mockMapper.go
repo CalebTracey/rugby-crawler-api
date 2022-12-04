@@ -35,9 +35,9 @@ func (m *MockMapperI) EXPECT() *MockMapperIMockRecorder {
 }
 
 // CreateInsertLeaderboardExec mocks base method.
-func (m *MockMapperI) CreateInsertLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string {
+func (m *MockMapperI) InsertLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateInsertLeaderboardExec", compIdStr, compName, td)
+	ret := m.ctrl.Call(m, "InsertLeaderboardExec", compIdStr, compName, td)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
@@ -45,13 +45,13 @@ func (m *MockMapperI) CreateInsertLeaderboardExec(compIdStr, compName string, td
 // CreateInsertLeaderboardExec indicates an expected call of CreateInsertLeaderboardExec.
 func (mr *MockMapperIMockRecorder) CreateInsertLeaderboardExec(compIdStr, compName, td interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateInsertLeaderboardExec", reflect.TypeOf((*MockMapperI)(nil).CreateInsertLeaderboardExec), compIdStr, compName, td)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertLeaderboardExec", reflect.TypeOf((*MockMapperI)(nil).InsertLeaderboardExec), compIdStr, compName, td)
 }
 
 // CreateUpdateLeaderboardExec mocks base method.
-func (m *MockMapperI) CreateUpdateLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string {
+func (m *MockMapperI) UpdateLeaderboardExec(compIdStr, compName string, td dtos.TeamLeaderboardData) string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUpdateLeaderboardExec", compIdStr, compName, td)
+	ret := m.ctrl.Call(m, "UpdateLeaderboardExec", compIdStr, compName, td)
 	ret0, _ := ret[0].(string)
 	return ret0
 }
@@ -59,5 +59,5 @@ func (m *MockMapperI) CreateUpdateLeaderboardExec(compIdStr, compName string, td
 // CreateUpdateLeaderboardExec indicates an expected call of CreateUpdateLeaderboardExec.
 func (mr *MockMapperIMockRecorder) CreateUpdateLeaderboardExec(compIdStr, compName, td interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUpdateLeaderboardExec", reflect.TypeOf((*MockMapperI)(nil).CreateUpdateLeaderboardExec), compIdStr, compName, td)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateLeaderboardExec", reflect.TypeOf((*MockMapperI)(nil).UpdateLeaderboardExec), compIdStr, compName, td)
 }
