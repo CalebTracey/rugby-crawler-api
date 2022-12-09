@@ -4,6 +4,7 @@ import (
 	"github.com/NYTimes/gziphandler"
 	config "github.com/calebtracey/config-yaml"
 	"github.com/calebtracey/rugby-crawler-api/internal/routes"
+	"github.com/calebtracey/rugby-crawler-api/internal/routes/openapi"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -26,7 +27,7 @@ func main() {
 	handler := routes.Handler{Service: facade}
 	router := handler.InitializeRoutes()
 
-	routes.RegisterOpenAPI(router)
+	openapi.RegisterOpenAPI(router)
 	c := CorsHandler()
 
 	log.Fatal(ListenAndServe(Port, gziphandler.GzipHandler(c.Handler(router))))
